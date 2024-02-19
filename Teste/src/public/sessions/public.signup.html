@@ -1,0 +1,79 @@
+<header class="header">
+  <a href="/" class="logo">
+    <img ng-src="{{SIGNUP.srcLogo}}" alt="Eticca" />
+  </a>
+  <nav class="navbar navbar-static-top" role="navigation">
+    <div class="navbar-left">
+      <ul class="nav navbar-nav">
+        <li>
+          <a href="/"><i class="fa fa-home"></i> Voltar</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<div class="wrapper row-offcanvas">
+  <aside class="right-side strech">
+    <section class="content-header">
+      <h1>Conclusão do Cadastro</h1>
+      <ol class="breadcrumb">
+        <li><a href="/"><i class="fa fa-home"></i> Eticca</a></li>
+        <li class="active">Conclusão do Cadastro</li>
+      </ol>
+    </section>
+    <br />
+    <div class="col-md-12 cadastro">
+      <div class="alert alert-danger no-margin" ng-show="!!error&&!success">
+        <button type="button" class="close" aria-hidden="true" ng-click="error=null">×</button>
+        <p ng-bind="error"></p>
+      </div>
+      <div class="text-center loading"
+        style="position: absolute;width: 100%;height: 100%;background-color: rgba(255, 255, 255, 0.78);"
+        ng-show="loading">
+        <div class="cssload-container">
+          <div class="cssload-double-torus"></div>
+        </div>
+      </div>
+      <form action="" name="registrar" method="post">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input class="form-control disabled" type="email" name="email" id="email" ng-model="email" ng-disabled="true"
+            required autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label for="nome">Nome Completo</label>
+          <input class="form-control" id="nome" type="text" name="nome" ng-model="nome" ng-disabled="registeredName"
+            required autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label for="cpf">CPF</label>
+          <input class="form-control" type="cpf" name="cpf" id="cpf" ng-model="cpf" ng-disabled="registeredCpf"
+            ui-br-cpf-mask required autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label for="senha">Senha</label>
+          <input class="form-control" type="password" name="senha" id="senha" autocomplete="off" ng-model="senha"
+            required autocomplete="off">
+        </div>
+        <div class="form-group">
+          <label for="confirmarSenha">Confirmar Senha</label>
+          <input class="form-control" type="password" name="confirmarSenha" id="confirmarSenha" autocomplete="off"
+            ng-model="confirmarSenha" required autocomplete="off">
+        </div>
+        <div class="form-group">
+          <p class="help-block">- A senha deverá ser composta por 8 ou mais caracteres e conter letras maiúsculas,
+            minúsculas e números.
+          </p>
+          <p class="help-block">- Atenção: Sua senha é intransferível e não deve ser revelada a outras pessoas;</p>
+        </div>
+        <div class="form-group text-center">
+          <button class="btn btn-success" type="button" ng-click="SIGNUP.signup()">
+            <i class="fa fa-check"></i>&nbsp;
+            Concluir Cadastro
+          </button>
+        </div>
+      </form>
+    </div>
+  </aside>
+</div>

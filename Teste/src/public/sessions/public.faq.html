@@ -1,0 +1,25 @@
+<header class="header">
+  <a href="/" class="logo">
+    <img ng-src="{{FAQ.srcLogo}}" alt="Eticca" />
+  </a>
+  <nav class="navbar navbar-static-top" role="navigation">
+    <div class="navbar-left"></div>
+  </nav>
+</header>
+<div class="wrapper row-offcanvas">
+  <aside class="right-side strech">
+    <section class="content-header">
+      <h1>FAQ</h1>
+      <ol class="breadcrumb">
+        <li>
+          <a href="/"><i class="fa fa-home"></i> Eticca</a>
+        </li>
+        <li class="active">FAQ</li>
+      </ol>
+    </section>
+    <br />
+    <div class="col-md-12">
+      <faq-container list="FAQ.list"></faq-container>
+    </div>
+  </aside>
+</div>

@@ -1,0 +1,564 @@
+<header class="header">
+  <a href="/" class="logo">
+    <img ng-src="{{COMPLAINT.srcLogo}}" alt="Eticca" />
+  </a>
+  <nav class="navbar navbar-static-top" role="navigation">
+    <div class="navbar-left"></div>
+  </nav>
+</header>
+<div class="wrapper row-offcanvas">
+  <aside class="right-side strech">
+     <section class="content-header">
+      <h1>{{denuncia}}</h1>
+      <ol class="breadcrumb">
+        <li>
+          <a href="/"><i class="fa fa-home"></i> Eticca</a>
+        </li>
+        <li class="active">{{denuncia}}</li>
+      </ol>
+    </section>
+    <br />
+    <div class="col-md-12 denuncia">
+      <div class="alert alert-danger no-margin" ng-show="!!error&&!success">
+        <button type="button" class="close" aria-hidden="true" ng-click="error=null">
+          ×
+        </button>
+        <p ng-bind="error.message"></p>
+      </div>
+      <br />
+      <div class="box box-info" ng-hide="!!success">
+        <div class="box-header">
+          <h3 class="box-title">Canal de {{denuncias | lowercase}} online</h3>
+        </div>
+        <div class="box-body" ng-hide="COMPLAINT.hideForm">
+          <form role="form" id="denuncia" method="post" enctype="multipart/form-data">
+            <div class="tabs-wrapper profile-tabs">
+              <ul class="nav nav-tabs">
+                <li class="active">
+                  <a ng-click="COMPLAINT.reloadRecaptcha(rcNewDenuncia)" data-target="#tab-conexoes"
+                    data-toggle="tab">Registrar {{denuncia | lowercase}}
+                  </a>
+                </li>
+                <li>
+                  <a ng-click="COMPLAINT.reloadRecaptcha(rcNewDenuncia)" id="search" data-target="#tab-dispositivos"
+                    data-toggle="tab">Buscar andamento {{denuncia | lowercase}}
+                  </a>
+                </li>
+              </ul>
+              <div class="tab-content">
+                <div class="tab-pane fade in active" id="tab-conexoes">
+                  <div class="table-responsive">
+                    <div id="novaDenuncia">
+                      <div class="form-group col-md-12">
+                        <h5 class="text-justify">
+                          <b>O sigilo das informações e a proteção ao {{denunciante}} são garantidos pelo {{keyCEtica}}
+                            da
+                            empresa. No formulário abaixo, você poderá optar por permanecer anônimo ou se identificar.
+                            Independentemente disso, ao final do registro de seu relato, você receberá um número de
+                            protocolo através do qual poderá acompanhar o andamento dado pelo Comitê de Ética e também
+                            interagir com ele, se necessário.</b> <i style="font-size: 0.7em"
+                            class="fa fa-asterisk text-danger"></i>
+                        </h5>
+                        <!--<textarea ng-model="texto" name="texto" id="texto" class="form-control" rows="10" placeholder="Descreva aqui sua denúncia..." required></textarea>-->
+                      </div>
+                      <div class="form-group col-md-12">
+                        <label for="empresa">Para qual Empresa? <i style="font-size: 0.7em"
+                            class="fa fa-asterisk text-danger"></i></label>
+                        <input ng-model="empresa" type="text" name="empresa" id="empresa" class="form-control" />
+                      </div>
+                      <div class="form-group col-md-12">
+                        <label for="estado">Estado <i style="font-size: 0.7em" class="fa text-danger"></i></label>
+                        <!-- <input ng-model="estado" type="text" name="estado" id="estado" class="form-control" /> -->
+                        <select ng-model="estado" type="text" name="estado" id="estado" class="form-control"
+                          ng-change="COMPLAINT.changeEstado()">
+                          <option ng-repeat="state in listaEstados" ng-bind="state.nome" ng-value="state.nome"></option>
+                        </select>
+                      </div>
+                      <div class="form-group col-md-12">
+                        <label for="estado">Cidade <i style="font-size: 0.7em"
+                            class="fa fa-asterisk text-danger"></i></label>
+                        <!-- <input ng-model="cidade" type="text" name="cidade" id="cidade" class="form-control" /> -->
+                        <select ng-model="cidade" type="text" name="cidade" id="cidade" class="form-control">
+                          <option ng-repeat="cidade in listaCidades" ng-bind="cidade.nome" ng-value="cidade.nome">
+                          </option>
+                        </select>
+                      </div>
+
+                      <!-- <div class="form-group col-md-12">
+                        <label for="informFilial">Informar filial?<i style="font-size: .7em"
+                            class="fa  text-danger"></i></label>
+                        <br>
+                        <label class="radio-inline"><input id="informFilial" type="radio" ng-model="informFilial"
+                            name="informFilial" value="true">Sim</label>
+                        <label class="radio-inline"><input id="informFilial2" type="radio" ng-model="informFilial"
+                            name="informFilial" value="false">Não</label>
+                      </div> -->
+                      <div class="form-group col-md-12">
+                        <label for="filialId">Filial <i style="font-size: 0.7em"
+                            class="fa fa-asterisk text-danger"></i></label>
+                        <!-- <input ng-model="filial" type="text" name="filial" id="filial" class="form-control"> -->
+                        <select ng-model="filialId" type="text" name="filialId" id="filialId" class="form-control"
+                          ng-change="COMPLAINT.changeFilial()">
+                          <option ng-repeat="filial in filiais" ng-bind="filial.nome" ng-value="filial.id"></option>
+                        </select>
+                      </div>
+                      <!-- <div class="form-group col-md-12" ng-if="filialId === ''"> -->
+                      <div class="form-group col-md-12" ng-show="filialId === ''">
+                        <label for="filial">Informe a filial <i style="font-size: 0.7em"
+                            class="fa fa-asterisk text-danger"></i></label>
+                        <input ng-model="filial" type="text" name="filial" id="filial" class="form-control"
+                          autocomplete="off" />
+                      </div>
+
+                      <div class="form-group col-md-12">
+                        <label for="departamento">Departamento<i style="font-size: 0.7em"
+                            class="fa text-danger"></i></label>
+                        <input ng-model="departamento" type="text" name="departamento" id="departamento"
+                          class="form-control" />
+                      </div>
+                      <div class="form-group col-md-12">
+                        <label for="tipoRelato">
+                          Tipo de relato <i style="font-size: 0.7em" class="fa fa-asterisk text-danger"></i>
+                        </label>
+                        <select ng-model="tipoRelato" type="text" name="tipoRelato" id="tipoRelato"
+                          ng-change="COMPLAINT.changeComplaintType(tipoRelato)" class="form-control">
+                          <option ng-value="0">
+                            Assédio moral ou agressão física
+                          </option>
+                          <option ng-value="1">
+                            Assédio sexual
+                          </option>
+                          <option ng-value="2">
+                            Acidente não reportado
+                          </option>
+                          <option ng-value="3">
+                            Desvio de comportamento
+                          </option>
+                          <option ng-value="4">
+                            Discriminação
+                          </option>
+                          <option ng-value="5">
+                            Distorções em demonstrações financeiras
+                          </option>
+                          <option ng-value="6">
+                            Descumprimento de normas e políticas internas
+                          </option>
+                          <option ng-value="7">
+                            Favorecimento ou conflito de interesses
+                          </option>
+                          <option ng-value="8">
+                            Fraude
+                          </option>
+                          <option ng-value="9">
+                            Lavagem de dinheiro
+                          </option>
+                          <option ng-value="10">
+                            Relacionamento íntimo com subordinação direta
+                          </option>
+                          <option ng-value="11">
+                            Roubo, furto ou desvio de materiais
+                          </option>
+                          <option ng-value="12">
+                            Uso ou tráfico de substâncias proibidas
+                          </option>
+                          <option ng-value="13">
+                            Uso indevido de bens e recursos
+                          </option>
+                          <option ng-value="14">
+                            Vazamento ou uso indevido de informações
+                          </option>
+                          <option ng-value="15">
+                            Violação de leis ambientais
+                          </option>
+                          <option ng-value="16">
+                            Violação de leis trabalhistas
+                          </option>
+                          <option ng-value="17">
+                            Violação de leis não explícitas nas demais categorias
+                          </option>
+                          <option ng-value="18">
+                            Pagamento ou recebimento impróprios (corrupção)
+                          </option>
+                          <option ng-value="19">
+                            Dúvidas, Sugestões ou Elogios
+                          </option>
+                          <option ng-value="20">
+                            Outros
+                          </option>
+                        </select>
+                      </div>
+                      <div class="form-group col-md-12">
+                        <label for="documento">Gostaria de se identificar?<i style="font-size: 0.7em"
+                            class="fa text-danger"></i></label>
+                        <br />
+                        <label class="radio-inline"><input id="identificar" type="radio" ng-model="identificar"
+                            name="optradio2" value="true" />Sim</label>
+                        <label class="radio-inline"><input id="identificar2" type="radio" ng-model="identificar"
+                            name="optradio2" value="false" />Não</label>
+                      </div>
+                      <div class="form-group col-md-8" ng-show="identificar == 'true'" ng-hide="identificar == 'false'">
+                        <label for="nome">Nome<i style="font-size: 0.7em"
+                            class="fa fa-asterisk text-danger"></i></label>
+                        <input ng-model="nome" type="text" name="nome" id="nome" class="form-control" />
+                      </div>
+                      <div class="form-group col-md-4" ng-show="identificar == 'true'" ng-hide="identificar == 'false'">
+                        <label for="telefone">Telefone</label>
+                        <input ng-model="telefone" type="tel" name="telefone" id="telefone" class="form-control" />
+                      </div>
+                      <div class="form-group col-md-12" ng-show="identificar == 'true'"
+                        ng-hide="identificar == 'false'">
+                        <label for="email">Email</label>
+                        <input ng-model="email" type="email" name="email" id="email" class="form-control"
+                          placeholder="exemplo@exemplo.com" autocomplete="off" />
+                      </div>
+                      <div class="form-group col-md-12" ng-hide="doubtSuggestionCompliment">
+                        <label for="fato">
+                          Existe alguma relação sua com o fato que será relatado ou com os envolvidos? <i
+                            style="font-size: 0.7em" class="fa fa-asterisk text-danger"></i>
+                        </label>
+                        <br />
+                        <label class="radio-inline">
+                          <input id="fato" type="radio" ng-model="fato" name="optradio" value="true" />Sim
+                        </label>
+                        <label class="radio-inline">
+                          <input id="fato2" type="radio" ng-model="fato" name="optradio" value="false" />Não
+                        </label>
+                      </div>
+                      <div class="form-group col-md-12" ng-show="fato == 'true'"
+                        ng-hide="fato == 'false' || doubtSuggestionCompliment">
+                        <textarea ng-model="fatoRelatado" name="fatoRelatado" id="fatoRelatado" class="form-control"
+                          rows="2" placeholder="Descreva aqui os fatos relatados..." required></textarea>
+                      </div>
+                      <div class="form-group col-md-12" ng-hide="doubtSuggestionCompliment">
+                        <label for="malfeitor">Quem é(são) o(s) suposto(s) {{keyMalfeitor}}
+                          envolvido(s)?</label>
+                        <textarea ng-model="malfeitor" name="malfeitor" id="malfeitor" class="form-control" rows="2"
+                          required></textarea>
+                      </div>
+                      <div class="form-group col-md-12" ng-hide="doubtSuggestionCompliment">
+                        <label for="testemunha">Existe alguma testemunha?</label>
+                        <textarea ng-model="testemunha" name="testemunha" id="testemunha" class="form-control" rows="2"
+                          required></textarea>
+                      </div>
+                      <div class="form-group col-md-12">
+                        <label for="problema">
+                          {{doubtSuggestionCompliment ? 'Que Dúvida(s), Sugestão(ões) ou Elogio(s) gostaria de enviar?'
+                          : 'Que problema gostaria de relatar?'}}
+                          <i style="font-size: 0.7em" class="fa fa-asterisk text-danger"></i>
+                        </label>
+                        <textarea ng-model="problema" name="problema" id="problema" class="form-control" rows="2"
+                          required></textarea>
+                      </div>
+                      <div class="form-group col-md-12" ng-hide="doubtSuggestionCompliment">
+                        <label for="evidencia">Existe alguma evidência?</label>
+                        <textarea ng-model="evidencia" name="evidencia" id="evidencia" class="form-control" rows="2"
+                          required></textarea>
+                      </div>
+                      <div class="form-group col-md-12">
+                        <label for="documento">Anexar</label>
+                        <ul ng-show="files && files.length" id="documentoFileList" class="file-list">
+                          <li ng-repeat="f in files">
+                            {{f.name}} &nbsp;<span class="fileError">{{f.sizeError ? ' * Arquivo maior que 2mb' :
+                              ''}}</span>
+                            <button ng-click="COMPLAINT.removeFile($index, 0)" type="button" class="close"
+                              data-dismiss="alert" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </li>
+                        </ul>
+                        <div class="input-group">
+                          <span class="input-group-btn">
+                            <div class="btn btn-default custom-file-uploader">
+                              <input type="file" id="documento" name="documento" file-model="file"
+                                accept=".avi, .jpg, .png, .bmp, .mp3. .mp4, .doc, .docx, .pdf"
+                                ng-on-change="changeFileInput(0)" multiple />
+                              Adicionar arquivo(s)
+                            </div>
+                          </span>
+                        </div>
+                        <span class="help-block">* Quantidade máxima de arquivos: 5</span>
+                        <span class="help-block">** Tamanho máximo de cada arquivo: 2mb</span>
+                      </div>
+                      <div class="col-md-12" ng-show="anexoError" style="margin-bottom: 10px">
+                        <div class="alert alert-danger no-margin">
+                          <p>{{anexoError}}</p>
+                        </div>
+                      </div>
+                      <div class="form-group col-md-12" ng-hide="doubtSuggestionCompliment">
+                        <label for="informacaoRelevante">
+                          Existe mais alguma informação que julgue ser relevante ao caso?
+                        </label>
+                        <textarea ng-model="informacaoRelevante" name="informacaoRelevante" id="informacaoRelevante"
+                          class="form-control" rows="2" required></textarea>
+                      </div>
+                      <div class="form-group col-md-12">
+                        <small class="control-label">
+                          Campos marcados com " <i style="font-size: 0.7em" class="fa fa-asterisk text-danger"></i>" são
+                          obrigatórios.
+                        </small>
+                      </div>
+                      <div class="col-xs-12">
+                        <div vc-recaptcha key="reCaptchaSiteKey" on-create="COMPLAINT.setRcNewDenuncia(widgetId)"
+                          ng-model="recaptchaResponse" style="margin-bottom: 10px"
+                          on-expire="COMPLAINT.recapchaExpiration()" lang="pt-BR"></div>
+                      </div>
+                      <div class="col-xs-12">
+                        <div class="form-group">
+                          <button ng-disabled="!recaptchaResponse || anexoError" class="btn btn-primary btn-lg"
+                            type="button" ng-click="COMPLAINT.send()">
+                            Enviar
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="tab-pane fade" id="tab-dispositivos">
+                  <div class="table-responsive">
+                    <div id="pesquisadeDenuncia">
+                      <div class="form-group col-md-12" style="margin-top: 15px">
+                        <label for="campoPesquisa">Insira o protocolo para realizar a pesquisa: <i
+                            style="font-size: 0.7em" class="fa fa-asterisk text-danger"></i></label>
+                        <input ng-model="campoPesquisa" ng-change="COMPLAINT.fnHideRecaptchaSearch(false)" type="text"
+                          name="campoPesquisa" id="campoPesquisa" class="form-control" />
+                      </div>
+                      <div class="col-xs-12" ng-hide="COMPLAINT.hideRecaptchaSearch">
+                        <div vc-recaptcha key="reCaptchaSiteKey" ng-model="recaptchaResponse"
+                          on-create="COMPLAINT.setRcSearchId(widgetId)" style="margin-bottom: 10px"
+                          on-expire="COMPLAINT.recapchaExpiration()" lang="pt-BR"></div>
+                      </div>
+                      <div class="col-xs-12">
+                        <div class="form-group">
+                          <button class="btn btn-primary" type="button" ng-click="COMPLAINT.pesquisar()"
+                            ng-disabled="!recaptchaResponse || !campoPesquisa" style="margin-top: 15px">
+                            Pesquisar
+                          </button>
+                        </div>
+                      </div>
+                      <div class="form-group col-md-12" name="denunciaDados" id="denunciaDados"
+                        ng-show="denunciaData.protocolo">
+                        <hr />
+                        <h5><b>Dados do(a) {{denuncia}}</b></h5>
+                        <div name="dadosDenuncia" id="dadosDenuncia">
+                          <div class="col-xs-12 col-md-12 invoice-col">
+                            <b>Protocolo: </b>{{denunciaData.protocolo}}<br />
+                          </div>
+                          <div class="col-xs-12 col-md-12 invoice-col">
+                            <b>Data de Abertura: </b>{{denunciaData.insertedAt |
+                            date : 'dd/MM/yyyy \'às\' HH\'h\'mm\'m\' '}}<br />
+                          </div>
+                          <div class="col-xs-12 col-md-12 invoice-col">
+                            <b>Cidade: </b>{{denunciaData.cidade}}<br />
+                          </div>
+                          <div class="col-xs-12 col-md-12 invoice-col">
+                            <b>Filial: </b>{{denunciaData.filial}}<br />
+                          </div>
+                          <div class="col-xs-12 col-md-12 invoice-col">
+                            <b>Departamento: </b>{{denunciaData.departamento}}<br />
+                          </div>
+                          <div class="col-xs-12 col-md-12 invoice-col">
+                            <b>Tipo de relato: </b>{{denunciaData.tipoRelatoText}}<br />
+                          </div>
+                          <div class="col-xs-12 col-md-12 invoice-col">
+                            <b>{{doubtSuggestionComplimentText}}:</b>
+                            {{denunciaData.problema}}<br />
+                          </div>
+                          <div class="col-xs-12 col-md-12 invoice-col" ng-hide="doubtSuggestionComplimentSearch">
+                            <b>Fatos Relatados: </b>{{denunciaData.fatoRelatado}}<br />
+                          </div>
+                          <div class="col-xs-12 col-md-12 invoice-col" ng-hide="doubtSuggestionComplimentSearch">
+                            <b>Suposto(s) {{keyMalfeitor}} envolvido(s): </b>{{denunciaData.malfeitor}}<br />
+                          </div>
+                          <div class="col-xs-12 col-md-12 invoice-col" ng-hide="doubtSuggestionComplimentSearch">
+                            <b>Testemunha(s): </b>{{denunciaData.testemunha}}<br />
+                          </div>
+                          <div class="col-xs-12 col-md-12 invoice-col" ng-hide="doubtSuggestionComplimentSearch">
+                            <b>Evidência(s): </b>{{denunciaData.evidencia}}<br />
+                          </div>
+                          <div class="col-xs-12 col-md-12 invoice-col" ng-hide="doubtSuggestionComplimentSearch">
+                            <b>Informação Relevante ao Caso: </b>{{denunciaData.informacaoRelevante}}<br />
+                          </div>
+                          <div class="col-xs-12 col-md-12 invoice-col">
+                            <b>Status Atual: </b><span class="label" style="font-size: 0.9em"
+                              ng-class="{'label-danger': denunciaData.status==='aberto','label-success': denunciaData.status==='fechado','label-warning': denunciaData.status==='em_progresso'}">
+                              {{denunciaData.status==='aberto'?'Aberto' :
+                              denunciaData.status==='fechado' ? 'Fechado' :
+                              'Em Progresso'}} </span><br />
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-12" ng-show="denunciaData.protocolo" style="float: left; margin: 15px 0">
+                        <ul class="timeline">
+                          <!-- timeline time label -->
+                          <li class="time-label">
+                            <span class="bg-red"> {{denunciaData.date}} </span>
+                          </li>
+                          <!-- /.timeline-label -->
+                          <!-- timeline item -->
+                          <li ng-repeat="resposta in listaExemplo">
+                            <!-- timeline icon -->
+                            <i class="fa fa-envelope bg-blue"></i>
+                            <i
+                              ng-class="{'fa fa-exclamation-circle bg-red': resposta.status==='aberto','fa fa-thumbs-up bg-green': resposta.status==='fechado','fa fa-eye bg-yellow': resposta.status==='em_progresso','fa fa-plus': resposta.isTramitacao}"></i>
+                            <div class="timeline-item">
+                              <span class="time"><i class="fa fa-clock-o"></i> {{resposta.insertedAt | date : 'dd/MM/yyyy
+                                \'às\' HH\'h\'mm\'m\' '}}</span>
+                              <h3 ng-hide="resposta.isTramitacao" class="timeline-header">
+                                <b>Um responsável</b> alterou o status do(a)
+                                {{denuncia}} para
+                                <strong class="text-uppercase"
+                                  ng-class="{'text-danger': resposta.status ==='aberto','text-success': resposta.status ==='fechado','text-warning': resposta.status ==='em_progresso'}">
+                                  {{resposta.status ==='aberto'?'Aberto' :
+                                  resposta.status ==='fechado' ? 'Fechado' :
+                                  'Em Progresso'}}
+                                </strong>
+                              </h3>
+                              <h3 ng-show="resposta.isTramitacao" class="timeline-header">
+                                Nova informação adicionada
+                              </h3>
+                              <div class="timeline-body">
+                                {{resposta.texto}}
+                              </div>
+                              <div class='timeline-footer'
+                                ng-hide="resposta.isTramitacao && resposta.files && resposta.files.length > 0">
+                                <a class="btn btn-info btn-flat btn-xs" type="button" ng-repeat="file in resposta.files"
+                                  ng-click="COMPLAINT.downloadAnexo(campoPesquisa, resposta.id)" target="_blank"
+                                  data-toggle="tooltip" title="{{file.originalname}}">
+                                  <i class="fa fa-download"></i>
+                                  Baixar anexo
+                                </a>
+                              </div>
+                            </div>
+                          </li>
+                          <li>
+                            <i class="fa fa-clock-o"></i>
+                          </li>
+                          <!-- END timeline item -->
+                        </ul>
+                      </div>
+                      <div class="col-md-12" ng-show="denunciaData.protocolo">
+                        <button type="button" class="btn btn-primary" data-target="#newInfoModal" data-toggle="modal"
+                          title="Adicionar nova informação" style="margin-bottom: 15px" ng-click="tramiteError=null">
+                          Nova informação
+                        </button>
+                      </div>
+                    </div>
+                    <div class="col-md-12" ng-show="tramiteSuccess" style="margin-top: 15px">
+                      <div class="alert alert-success no-margin">
+                        <p>{{tramiteSuccess}}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!--<div class="form-group col-md-12">-->
+            <!--<label for="documento">Selecione a opção <i style="font-size: .7em" class="fa fa-asterisk text-danger"></i></label>-->
+            <!--<br>-->
+            <!--<label class="btn btn-primary">-->
+            <!--<input id="i1" type="radio" ng-model="opcao" name="optradio5" value="Novo">Nova Denúncia</label>-->
+            <!--<label class="btn btn-primary">-->
+            <!--<input id="i2" type="radio" ng-model="opcao" name="optradio5" value="Pesquisar">Andamento da Denúncia</label>-->
+            <!--</div>-->
+          </form>
+        </div>
+      </div>
+      <div class="alert alert-success no-margin" ng-show="!!success">
+        <p ng-bind="success.message"></p>
+      </div>
+      <div class="jumbotron no-margin" ng-show="!!success">
+        <h1 class="text-center" ng-bind="success.protocolo"></h1>
+        <p class="text-center">Protocolo do(a) {{denuncia}}.</p>
+      </div>
+      <br />
+      <div class="text-center" ng-show="!!success">
+        <a class="btn btn-primary" href="/">Voltar</a>
+        <button class="btn btn-info" ng-click="success=error=email=file=null">
+          Novo(a) {{denuncia}}
+        </button>
+      </div>
+    </div>
+  </aside>
+</div>
+<div class="modal fade" id="newInfoModal" tabindex="-1" role="dialog" data-backdrop="static" data-keyboard="false"
+  aria-labelledby="newInfoModalLabel">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title" id="newInfoModalLabel">
+          Adicionar nova informação
+        </h4>
+      </div>
+      <div class="modal-body" style="min-height: 300px">
+        <div class="row">
+          <div class="form-group col-md-12">
+            <label for="tramiteProblema">Que informação gostaria de adicionar?</label>
+            <textarea ng-model="denunciaDataTexto" name="problema" id="tramiteProblema" class="form-control" rows="2"
+              required></textarea>
+          </div>
+          <div class="form-group col-md-12">
+            <label for="documento">Anexar</label>
+            <ul ng-show="denunciaDataFiles && denunciaDataFiles.length" id="denunciaDocumentoFileList"
+              class="file-list">
+              <li ng-repeat="f in denunciaDataFiles">
+                {{f.name}} &nbsp;<span class="fileError">{{f.sizeError ? ' * Arquivo maior que 2mb' : ''}}</span>
+                <button ng-click="COMPLAINT.removeFile($index, 1)" type="button" class="close" data-dismiss="alert"
+                  aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </li>
+            </ul>
+            <div class="input-group">
+              <span class="input-group-btn">
+                <div class="btn btn-default custom-file-uploader">
+                  <input type="file" id="tramiteDocumento" name="documento" file-model="denunciaDataFile"
+                    accept=".avi, .jpg, .png, .bmp, .mp3. .mp4, .doc, .docx, .pdf" ng-on-change="changeFileInput(1)"
+                    multiple />
+                  Adicionar arquivo(s)
+                </div>
+              </span>
+            </div>
+            <span class="help-block">* Quantidade máxima de arquivos: 5</span>
+            <span class="help-block">** Tamanho máximo de cada arquivo: 2mb</span>
+          </div>
+          <div class="col-md-12" ng-show="tramiteAnexoError" style="margin-bottom: 10px">
+            <div class="alert alert-danger no-margin">
+              <p>{{tramiteAnexoError}}</p>
+            </div>
+          </div>
+          <div class="col-md-12" ng-show="denunciaDataHasError">
+            <p>
+              <i style="font-size: 0.7em" class="fa fa-asterisk text-danger"></i> Insira um texto ou anexo para
+              adicionar!
+            </p>
+          </div>
+          <div class="col-md-12">
+            <div vc-recaptcha key="reCaptchaSiteKey" ng-model="recaptchaResponse"
+              on-create="COMPLAINT.setRcNewInfoId(widgetId)" style="margin-bottom: 10px"
+              on-expire="COMPLAINT.recapchaExpiration()" lang="pt-BR"></div>
+          </div>
+          <div class="col-md-12" ng-show="tramiteError" style="margin-top: 15px">
+            <div class="alert alert-danger no-margin">
+              <button type="button" class="close" aria-hidden="true" ng-click="tramiteError=null">
+                ×
+              </button>
+              <p>{{tramiteError}}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">
+          Fechar
+        </button>
+        <button type="button" class="btn btn-primary" ng-disabled="!recaptchaResponse || tramiteAnexoError"
+          ng-click="COMPLAINT.saveTramite()">
+          Adicionar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
