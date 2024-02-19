@@ -1,0 +1,238 @@
+<app-template app-ref="VPRO.appRef">
+  <div class="col-xs-12">
+    <div class="form-group">
+      <label for="VPRO.dropGrupos">Grupo de Usuários</label>
+      <select name="dropGrupos" id="VPRO.dropGrupos" name="VPRO.dropGrupos" ng-change="VPRO.update()"
+        class="form-control" ng-model="VPRO.selectedGrupo" required>
+        <option ng-repeat="item in VPRO.dropGrupo" value="{{item.id}}">{{item.nome}}</option>
+      </select>
+    </div>
+  </div>
+  <div class="col-sm-12 invoice-col" ng-show="VPRO.programaVigente.nome">
+    <div class="box box-solid">
+      <div class="box-header with-border">
+        <i class="fa fa-star" style="color: gold"></i>
+        <h3 class="box-title">Programa Vigente</h3>
+      </div>
+      <div class="box-body">
+        <b>Versão:</b> {{VPRO.programaVigente.versao}}<br>
+        <b>Nome:</b> {{VPRO.programaVigente.nome}}<br>
+        <b>Data Registro:</b> {{VPRO.programaVigente.insertedAt | date : 'dd/MM/yyyy \'às\' HH\'h\'mm\'m\' '}}
+      </div>
+    </div>
+  </div>
+  <div class="col-md-12">
+    <h3 class="help-block" ng-hide="VPRO.programaVigente.nome">Não há programa vigente!</h3>
+  </div>
+  <br>
+  <div class="col-md-12" id="tableUsers">
+    <div class="box">
+      <div class="box-header">
+        <h3 class="box-title">Programas Cadastrados</h3>
+        <div class="box-tools">
+          <div class="input-group">
+            <input ng-model="VPRO.pagination.search" type="text" name="table_search"
+              ng-change="VPRO.pesquisar(VPRO.pagination.search)" class="form-control input-sm pull-right"
+              style="width: 150px;" ng-model-options="{ debounce: 1000 }" placeholder="Pesquisar">
+            <div class="input-group-btn">
+              <button class="btn btn-sm btn-default">
+                <i class="fa fa-search"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="box-body table-responsive no-padding">
+        <table class="table table-hover">
+          <thead>
+            <tr class="orderby">
+              <th>Versão <i class="fa" ng-show="VPRO.order.predicate=='nome'"
+                  ng-class="{'fa-sort-desc': VPRO.order.reverse, 'fa-sort-up': !VPRO.order.reverse}"></i></th>
+              <th>Nome <i class="fa" ng-show="VPRO.order.predicate=='nome'"
+                  ng-class="{'fa-sort-desc': VPRO.order.reverse, 'fa-sort-up': !VPRO.order.reverse}"></i></th>
+              <th>Data Registro <i class="fa" ng-show="VPRO.order.predicate=='email'"
+                  ng-class="{'fa-sort-desc': VPRO.order.reverse, 'fa-sort-up': !VPRO.order.reverse}"></i></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="linkable" ng-repeat="versaoPrograma in VPRO.pagination.list"
+              ng-click="VPRO.viewVersao($event, versaoPrograma)">
+              <td ng-bind="versaoPrograma.versao"></td>
+              <td ng-bind="versaoPrograma.nome||((versaoPrograma.nome | limitTo:60)+'...')"></td>
+              <td ng-bind="versaoPrograma.insertedAt | date : 'dd/MM/yyyy \'às\' HH\'h\'mm\'m\' '"></td>
+              <td>
+                <i class="fa fa-star" ng-show="versaoPrograma.active" style="color: gold"></i>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="col-md-12">
+          <h3 class="help-block" ng-hide="VPRO.pagination.list.length">Nenhum resultado encontrado!</h3>
+        </div>
+        <div class="box-footer clearfix">
+          <ul class="pagination pagination-sm no-margin pull-right">
+            <li ng-click="VPRO.pagination.prev()" ng-class="{'disabled': VPRO.pagination.page===0}"><a href="#">«</a>
+            </li>
+            <li ng-repeat="page in VPRO.pagination.range" ng-class="{'disabled': VPRO.pagination.page===page}"
+              ng-click="VPRO.pagination.goTo(page)">
+              <a href="#" ng-bind="page+1"></a>
+            </li>
+            <li ng-click="VPRO.pagination.next()"
+              ng-class="{'disabled': VPRO.pagination.page===(VPRO.pagination.totalPages-1)}"><a href="#">»</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-12">
+    <button class="btn btn-primary btn-lg" ng-click="VPRO.modalForm.open('new', 'Novo Programa', 'Ativar')">
+      <i class="fa fa-plus"></i> Novo
+    </button>
+  </div>
+  <div class="modal fade" id="modalForm" tabindex="-1" role="dialog" aria-labelledby="modalForm">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+              aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" ng-bind="VPRO.modalForm.title"></h4>
+        </div>
+        <div class="modal-body">
+          <form role="form" ng-class="{'has-error': VPRO.modalForm.error}" name="userForm">
+            <div class="box-body">
+              <div class="form-group">
+                <label for="versao">Versão</label>
+                <input type="text" class="form-control" id="versao" name="versao"
+                  ng-change="VPRO.modalForm.buscarDrops(VPRO.versaoSave.versao)"
+                  ng-model="VPRO.versaoSave.versao" required>
+                <p class="text-danger" ng-if="VPRO.modalForm.validations.versao"
+                  ng-bind="VPRO.modalForm.validations.versao"></p>
+              </div>
+              <div class="form-group">
+                <label for="nome">Nome</label>
+                <input type="text" class="form-control" id="nome" name="nome" ng-model="VPRO.versaoSave.nome"
+                  required>
+                <p class="text-danger" ng-if="VPRO.modalForm.validations.nome"
+                  ng-bind="VPRO.modalForm.validations.nome">
+                </p>
+              </div>
+              <!-- <div class="form-group">
+                <label for="ordem">Ordem</label>
+                <input type="text" class="form-control" id="ordem" name="ordem" ng-model="VPRO.versaoSave.ordem"
+                  required>
+                <p class="text-danger" ng-if="VPRO.modalForm.validations.ordem"
+                  ng-bind="VPRO.modalForm.validations.ordem">
+                </p>
+              </div> -->
+              <div class="form-group">
+                <label for="nome">Descrição</label>
+                <textarea class="form-control" name="descricao" id="descricao" cols="30" rows="5"
+                  ng-model="VPRO.versaoSave.descricao"></textarea>
+              </div>
+              <div class="form-group">
+                <label for="dropdocumentos">Documentos</label>
+                <select name="dropdocumentos" id="dropdocumentos" class="form-control" ng-model="VPRO.selectedVDoc"
+                  required>
+                  <option ng-repeat="itemDoc in VPRO.dropDocumento" value="{{itemDoc.id}}">{{itemDoc.versao}} -
+                    {{itemDoc.nome}}</option>
+                </select>
+                <p class="text-danger" ng-if="VPRO.modalForm.validations.documentos"
+                  ng-bind="VPRO.modalForm.validations.documentos"></p>
+                <!--<select class="form-control" ng-options="usr.versao + ' - ' + usr.nome  for usr in VPRO.dropDocumento track by usr.id" ng-model="VPRO.selectedVDoc">
+                              </select>-->
+              </div>
+              <div class="form-group">
+                <label for="droptreinamentos">Treinamentos</label>
+                <select name="treinamentos" id="droptreinamentos" class="form-control" ng-model="VPRO.selectedVTrei"
+                  required>
+                  <option ng-repeat="itemTrei in VPRO.dropTreinamento" value="{{itemTrei.id}}">{{itemTrei.versao}} -
+                    {{itemTrei.nome}}</option>
+                </select>
+                <p class="text-danger" ng-if="VPRO.modalForm.validations.treinamentos"
+                  ng-bind="VPRO.modalForm.validations.treinamentos"></p>
+              </div>
+              <div class="form-group">
+                <label>Questões</label>
+                <select class="form-control" ng-model="VPRO.selectedVQues" required>
+                  <option ng-repeat="itemQues in VPRO.dropQuestao" value="{{itemQues.id}}">{{itemQues.versao}} -
+                    {{itemQues.nome}}</option>
+                </select>
+                <p class="text-danger" ng-if="VPRO.modalForm.validations.questoes"
+                  ng-bind="VPRO.modalForm.validations.questoes"></p>
+              </div>
+              <div class="form-group" ng-hide="!VPRO.versaoSave.activing">
+                <input type="checkbox" id="notificarColaboradores"
+                  ng-model="VPRO.versaoSave.notificarColaboradores">
+                <label for="notificarColaboradores">Notificar Colaboradores</label>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-warning pull-left" ng-click="VPRO.modalForm.clearModalForm()"
+            ng-if="VPRO.modalForm.doing === 'new'">Limpar</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+          <button type="button" class="btn btn-success" ng-click="VPRO.modalForm.save()" ng-bind="VPRO.modalForm.button"
+            ng-disabled="userForm.$invalid"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="modalFormInfo" tabindex="-1" role="dialog" aria-labelledby="modalFormInfo">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+              aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">Informações do Programa</h4>
+        </div>
+        <div class="modal-body">
+          <form role="form" name="userForm">
+            <div class="box-body">
+              <div class="form-group">
+                <b>Nome: </b>
+                <span ng-bind="VPRO.versaoDetail.nome"></span>
+                <br>
+              </div>
+              <div class="form-group">
+                <b>Versão: </b>
+                <span ng-bind="VPRO.versaoDetail.versao"></span>
+                <br>
+              </div>
+              <!-- <div class="form-group">
+                <b>Ordem: </b>
+                <span ng-bind="VPRO.versaoDetail.ordem"></span>
+                <br>
+              </div> -->
+              <div class="form-group">
+                <b>Descrição: </b>
+                <span ng-bind="VPRO.versaoDetail.descricao"></span>
+                <br>
+              </div>
+              <div class="form-group">
+                <b>Versão dos Documentos: </b>
+                <span ng-bind="VPRO.versaoDetail.documentoSelecionado"></span>
+              </div>
+              <div class="form-group">
+                <b>Versão dos Questões: </b>
+                <span ng-bind="VPRO.versaoDetail.questaoSelecionado"></span>
+              </div>
+              <div class="form-group">
+                <b>Versão dos Treinamento: </b>
+                <span ng-bind="VPRO.versaoDetail.treinamentoSelecionado"></span>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+          <button type="button" class="btn btn-primary"
+            ng-click="VPRO.modalForm.open('edit', 'Editar Programa', 'Editar')">Editar</button>
+          <button type="button" class="btn btn-success"
+            ng-click="VPRO.modalForm.open('active', 'Ativar Programa', 'Ativar')">Ativar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-template>

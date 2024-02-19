@@ -1,0 +1,27 @@
+<app-template app-ref="RELC.appRef">
+  <div class="col-xs-12">
+    <div class="form-group">
+      <label for="RELC.dropClientes">Clientes</label>
+      <select
+        name="dropClientes"
+        id="RELC.dropClientes"
+        name="RELC.dropClientes"
+        class="form-control"
+        ng-model="RELC.selectedCliente"
+        required
+      >
+        <option
+          ng-repeat="item in RELC.dropClientes"
+          value="{{item.mainCompany}}"
+        >
+          {{item.clientAlias}}
+        </option>
+      </select>
+    </div>
+    <div class="form-group">
+      <button class="btn btn-primary" ng-click="RELC.geraRelatorio()">
+        Gerar Relatório
+      </button>
+    </div>
+  </div>
+</app-template>

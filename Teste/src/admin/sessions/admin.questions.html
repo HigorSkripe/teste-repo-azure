@@ -1,0 +1,307 @@
+<app-template app-ref="QUES.appRef">
+  <div class="col-xs-12">
+    <div class="form-group">
+      <label for="QUES.dropGrupos">Grupo de Usuários</label>
+      <select name="dropGrupos" id="QUES.dropGrupos" name="QUES.dropGrupos" ng-change="QUES.update()"
+        class="form-control" ng-model="QUES.selectedGrupo" required>
+        <option ng-repeat="item in QUES.dropGrupo" value="{{item.id}}">{{item.nome}}</option>
+      </select>
+    </div>
+  </div>
+  <div class="col-md-12">
+    <div class="box box-primary">
+      <div class="box-header">
+        <h3 class="box-title">Todas as Versões das Questões</h3>
+        <div class="box-tools">
+          <div class="input-group">
+            <input type="text" name="search" class="form-control input-sm pull-right" style="width: 150px;"
+              placeholder="Pesquisar" ng-model="QUES.pagination.search" ng-change="QUES.pesquisar(QUES.pagination.search)">
+            <div class="input-group-btn">
+              <button class="btn btn-sm btn-default">
+                <i class="fa fa-search"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="box-body table-responsive no-padding">
+        <table class="table table-hover table-condensed">
+          <thead>
+            <tr>
+              <th>Versão</th>
+              <th>Nome</th>
+              <th>Registro</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="linkable"
+              ng-repeat="versaoQuestao in QUES.pagination.list">
+              <td ng-bind="versaoQuestao.versao" ng-click="QUES.viewVersao($event, versaoQuestao)"></td>
+              <td ng-bind="versaoQuestao.nome||((versaoQuestao.nome | limitTo:60)+'...')" ng-click="QUES.viewVersao($event, versaoQuestao)"></td>
+              <td ng-bind="versaoQuestao.insertedAt | date : 'dd/MM/yyyy \'às\' HH\'h\'mm\'m\' '" ng-click="QUES.viewVersao($event, versaoQuestao)"></td>
+              <td>
+                <button class="btn btn-icon btn-danger" data-toggle="modal" data-target="#modalConfirmDel"
+                  title="Remover versão" ng-click="QUES.remove(versaoQuestao)" id="del_{{versaoQuestao.id}}">
+                  <i class="fa fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="col-md-12">
+          <h3 class="help-block" ng-hide="QUES.pagination.list.length">Nenhum resultado encontrado!</h3>
+        </div>
+      </div>
+      <div class="box-footer clearfix">
+        <ul class="pagination pagination-sm no-margin pull-right">
+          <li ng-click="QUES.pagination.prev()" ng-class="{'disabled': QUES.pagination.page===0}">
+            <a href="#">«</a>
+          </li>
+          <li ng-repeat="page in QUES.pagination.range" ng-class="{'disabled': QUES.pagination.page===page}"
+            ng-click="QUES.pagination.goTo(page)">
+            <a href="#" ng-bind="page+1"></a>
+          </li>
+          <li ng-click="QUES.pagination.next()"
+            ng-class="{'disabled': QUES.pagination.page===(QUES.pagination.totalPages-1)}">
+            <a href="#">»</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-12">
+    <button class="btn btn-primary" ng-click="QUES.modalForm.open('new', 'Nova Versão', 'Cadastrar')">
+      <i class="fa fa-plus"></i>&nbsp;&nbsp;Novo
+    </button>
+  </div>
+  <div class="modal fade" id="modalQuestao" tabindex="-1" role="dialog" aria-labelledby="modalQuestao">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h4 class="modal-title" ng-bind="QUES.modalQuestao.title"></h4>
+        </div>
+        <div class="modal-body">
+          <form name="questaoForm">
+            <div class="form-group" ng-class="{'has-error': questaoForm.nome.$invalid}">
+              <label for="nome">Nome</label>
+              <input type="text" name="nome" id="nome" ng-model="QUES.modalQuestao.model.nome" class="form-control"
+                required>
+              <span class="control-label" ng-show="questaoForm.nome.$error.required">* Campo requerido!</span>
+            </div>
+            <div class="form-group" ng-class="{'has-error': questaoForm.enunciado.$invalid}">
+              <label for="enunciado">Enunciado</label>
+              <input type="text" name="enunciado" id="enunciado" ng-model="QUES.modalQuestao.model.enunciado"
+                class="form-control" required>
+              <span class="control-label" ng-show="questaoForm.enunciado.$error.required">* Campo requerido!</span>
+            </div>
+            <div class="form-group" ng-class="{'has-error': false}">
+              <label>Respostas</label>
+              <div style="padding: 2px; border-bottom: 1px solid black; margin-bottom: 5px" class="col-xs-12"
+                ng-repeat="(key, resp) in QUES.modalQuestao.model.respostas track by $index">
+                <div class="col-xs-8">
+                  <p ng-bind="resp"></p>
+                </div>
+                <div class="col-xs-4">
+                  <button class="btn btn-primary btn-sm" style="width: 34.02px" ng-hide="resp.editing"
+                    ng-click="QUES.modalQuestao.resp.edit(key)">
+                    <i class="fa fa-edit"></i>
+                  </button>
+                  <button class="btn btn-danger btn-sm" style="width: 34.02px; margin-left: 10px" ng-hide="resp.editing"
+                    ng-click="QUES.modalQuestao.resp.delete(key)">
+                    <i class="fa fa-trash"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="input-group">
+                <label for="resposta">{{QUES.modalQuestao.resp.key!==null?'Atualizar':'Adicionar'}} resposta</label>
+                <div class="text-center">
+                  <textarea name="resposta" id="resposta" cols="100" rows="10" class="form-control"
+                    ng-model="QUES.modalQuestao.resp.text"></textarea>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <button class="btn btn-primary btn-sm" ng-click="QUES.modalQuestao.addResp()"
+                ng-disabled="!QUES.modalQuestao.resp.text.length">
+                <i class="fa fa-plus"></i>&nbsp;{{QUES.modalQuestao.resp.key!==null?'Atualizar':'Adicionar'}}
+              </button>
+              <button class="btn btn-warning btn-sm" ng-click="QUES.modalQuestao.resp.clear()"
+                ng-show="QUES.modalQuestao.resp.key!==null" style="border-left: 5px">
+                <i class="fa fa-remove"></i>&nbsp;Cancelar
+              </button>
+            </div>
+            <div class="form-group" ng-class="{'has-error': questaoForm.respostaCerta.$invalid}">
+              <label for="respostaCerta">Resposta Certa</label>
+              <select name="respostaCerta" id="respostaCerta" ng-model="QUES.modalQuestao.model.respostaCerta"
+                class="form-control" ng-options="resp for resp in QUES.modalQuestao.model.respostas" required>
+              </select>
+              <span class="control-label" ng-show="questaoForm.respostaCerta.$error.required">* Campo requerido!</span>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-warning pull-left" ng-click="QUES.modalQuestao.clear()">Limpar</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+          <button type="button" class="btn btn-danger"
+            ng-bootbox-confirm="Tem certeza que deseja apagar a questão selecionada?"
+            ng-bootbox-confirm-action="QUES.modalQuestao.delete()"
+            ng-show="QUES.modalQuestao.doing==='update'">Apagar</button>
+          <button type="button" class="btn btn-success" ng-click="QUES.modalQuestao.save()"
+            ng-disabled="questaoForm.$invalid">Salvar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="modalForm" tabindex="-1" role="dialog" aria-labelledby="modalForm">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h4 class="modal-title" ng-bind="QUES.modalForm.title"></h4>
+        </div>
+        <div class="modal-body">
+          <form role="form" name="userForm">
+            <div class="box-body">
+              <div class="form-group">
+                <label for="versao">Versão</label>
+                <input type="text" class="form-control" id="versao" name="versao" ng-model="QUES.modalForm.model.versao"
+                  required>
+                <p class="text-danger" ng-if="QUES.modalForm.validations.versao"
+                  ng-bind="QUES.modalForm.validations.versao"></p>
+              </div>
+              <div class="form-group">
+                <label for="nome">Nome</label>
+                <input type="text" class="form-control" id="nome" name="nome" ng-model="QUES.modalForm.model.nome"
+                  required>
+                <p class="text-danger" ng-if="QUES.modalForm.validations.nome"
+                  ng-bind="QUES.modalForm.validations.nome"></p>
+              </div>
+              <div class="form-group">
+                <label for="nome">Descrição</label>
+                <textarea class="form-control" name="descricao" id="descricao" cols="30" rows="5"
+                  ng-model="QUES.modalForm.model.descricao"></textarea>
+              </div>
+              <div class="form-group" ng-show="!QUES.isPrimeiraVersao">
+                <input type="checkbox" id="copyContent" ng-model="QUES.modalForm.model.copyContent">
+                <label for="copyContent">Desejo copiar o conteúdo da versão ativa de questões</label>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-warning pull-left"
+            ng-click="QUES.modalForm.clearModalForm()">Limpar</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+          <button type="button" class="btn btn-success" ng-click="QUES.modalForm.save()">Salvar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="modalDetail" tabindex="-1" role="dialog" aria-labelledby="modalDetail">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h4>Detalhes de
+            <b>{{QUES.versaoDetail.nome}}</b>
+          </h4>
+        </div>
+        <div class="modal-body">
+          <div>
+            <p>
+              <strong>Nome:</strong>
+              <span ng-bind="QUES.versaoDetail.nome"></span>
+            </p>
+            <p>
+              <strong>Versão: </strong>
+              <span ng-bind="QUES.versaoDetail.versao"></span>
+            </p>
+            <p>
+              <strong>Descrição: </strong>
+              <span ng-bind="QUES.versaoDetail.descricao"></span>
+            </p>
+            <p>
+              <strong>Data Criação: </strong>
+              <span ng-bind="QUES.versaoDetail.insertedAt | date : 'dd/MM/yyyy \'às\' HH:mm'"></span>
+            </p>
+          </div>
+          <div class="box-body table-responsive no-padding">
+            <table class="table table-hover table-condensed">
+              <thead>
+                <tr style="cursor: pointer">
+                  <th ng-click="QUES.modalForm.orderBy('enunciado')">Enunciado
+                    <i class="fa" ng-show="QUES.modalForm.order.predicate=='enunciado'"
+                      ng-class="{'fa-sort-desc': !QUES.modalForm.order.reverse, 'fa-sort-up': QUES.modalForm.order.reverse}"></i>
+                  </th>
+                  <th ng-click="QUES.modalForm.orderBy('nome')">Nome
+                    <i class="fa" ng-show="QUES.modalForm.order.predicate=='nome'"
+                      ng-class="{'fa-sort-desc': !QUES.modalForm.order.reverse, 'fa-sort-up': QUES.modalForm.order.reverse}"></i>
+                  </th>
+                  <th ng-click="QUES.modalForm.orderBy('insertedAt')">Data de inserção
+                    <i class="fa" ng-show="QUES.modalForm.order.predicate=='insertedAt'"
+                      ng-class="{'fa-sort-desc': !QUES.modalForm.order.reverse, 'fa-sort-up': QUES.modalForm.order.reverse}"></i>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="linkable"
+                  ng-repeat="questao in QUES.filteredQuestao = (QUES.questoes | filter : QUES.search | orderBy : QUES.modalForm.order.predicate:QUES.modalForm.order.reverse)"
+                  ng-click="QUES.modalQuestao.open(questao,'update')">
+                  <td ng-bind="questao.enunciado.length>40?(questao.enunciado | limitTo:40)+'...':questao.enunciado">
+                  </td>
+                  <td ng-bind="questao.nome"></td>
+                  <td ng-bind="questao.insertedAt | date : 'dd/MM/yyyy' "></td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="col-md-12">
+              <h3 class="help-block" ng-hide="QUES.filteredQuestao.length">Nenhum resultado encontrado!</h3>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button ng-click="QUES.modalQuestao.open(null,'create')" type="button" class="btn btn-info">
+            <i class="fa fa-user"></i>Nova Questão </button>
+          <button type="button" class="btn btn-primary"
+            ng-click="QUES.modalForm.open('edit', 'Editar Versão', 'Salvar', QUES.versaoDetail)">
+            <i class="fa fa-edit"></i> Editar </button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">
+            <i class="fa fa-close"></i> Fechar </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="modalConfirmDel" tabindex="-1" role="dialog" aria-labelledby="modalForm"
+    data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click=""><span
+              aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">Confirme sua ação de exclusão</h4>
+        </div>
+        <div class="modal-body">
+          <label>
+            Tem certeza que deseja remover o Versionamento de Questões?
+          </label>
+          <br>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" data-dismiss="modal" ng-click="QUES.confirmRemove(false)">
+            <i class="fa fa-close"></i>
+            Não </button>
+          <button type="button" class="btn btn-danger" data-dismiss="modal" ng-click="QUES.confirmRemove(true)">
+            <i class="fa fa-check"></i> Sim </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-template>

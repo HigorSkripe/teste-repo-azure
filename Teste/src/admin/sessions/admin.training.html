@@ -1,0 +1,287 @@
+<app-template app-ref="TREI.appRef">
+  <div class="col-xs-12">
+    <div class="form-group">
+      <label for="TREI.dropGrupos">Grupo de Usuários</label>
+      <select name="dropGrupos" id="TREI.dropGrupos" name="TREI.dropGrupos" ng-change="TREI.update()"
+        class="form-control" ng-model="TREI.selectedGrupo" required>
+        <option ng-repeat="item in TREI.dropGrupo" value="{{item.id}}">{{item.nome}}</option>
+      </select>
+    </div>
+  </div>
+  <div class="col-md-12">
+    <div class="box box-primary">
+      <div class="box-header">
+        <h3 class="box-title">Todos os Treinamentos</h3>
+        <div class="box-tools">
+          <div class="input-group">
+            <input type="text" name="search" class="form-control input-sm pull-right" style="width: 150px;"
+              placeholder="Pesquisar" ng-model="TREI.pagination.search"
+              ng-change="TREI.pesquisar(TREI.pagination.search)">
+            <div class="input-group-btn">
+              <button class="btn btn-sm btn-default">
+                <i class="fa fa-search"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="box-body table-responsive no-padding">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Versão</th>
+              <th>Nome</th>
+              <th>Tipo</th>
+              <th>Registro</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="linkable" ng-repeat="versaoTreinamento in TREI.pagination.list">
+              <td ng-bind="versaoTreinamento.versao" ng-click="TREI.viewVersao(versaoTreinamento)"></td>
+              <td ng-bind="versaoTreinamento.nome||((documento.nome | limitTo:60)+'...')"
+                ng-click="TREI.viewVersao(versaoTreinamento)"></td>
+              <td ng-bind="versaoTreinamento.tipo" ng-click="TREI.viewVersao(versaoTreinamento)"></td>
+              <td ng-bind="versaoTreinamento.insertedAt | date : 'dd/MM/yyyy \'às\' HH\'h\'mm\'m\' '"
+                ng-click="TREI.viewVersao(versaoTreinamento)"></td>
+              <td>
+                <button class="btn btn-icon btn-danger" data-toggle="modal" data-target="#modalConfirmDel"
+                  title="Remover versão" ng-click="TREI.remove(versaoTreinamento)" id="del_{{versaoTreinamento.id}}">
+                  <i class="fa fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="col-md-12">
+          <h3 class="help-block" ng-hide="TREI.pagination.list.length">Nenhum resultado encontrado!</h3>
+        </div>
+      </div>
+      <div class="box-footer clearfix">
+        <ul class="pagination pagination-sm no-margin pull-right">
+          <li ng-click="TREI.pagination.prev()" ng-class="{'disabled': TREI.pagination.page===0}"><a href="#">«</a>
+          </li>
+          <li ng-repeat="page in TREI.pagination.range" ng-class="{'disabled': TREI.pagination.page===page}"
+            ng-click="TREI.pagination.goTo(page)">
+            <a href="#" ng-bind="page+1"></a>
+          </li>
+          <li ng-click="TREI.pagination.next()"
+            ng-class="{'disabled': TREI.pagination.page===(TREI.pagination.totalPages-1)}"><a href="#">»</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-12">
+    <button class="btn btn-primary" ng-click="TREI.modalForm.open('new')">
+      <i class="fa fa-plus"></i>&nbsp;&nbsp;Novo
+    </button>
+  </div>
+  <br>
+  <div class="modal fade" id="modalForm" tabindex="-1" role="dialog" aria-labelledby="modalForm">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h4 class="modal-title"
+            ng-bind="TREI.modalForm.model.id ? 'Editar versão de treinamento' : 'Nova versão de treinamento'"></h4>
+        </div>
+        <div class="modal-body">
+          <form role="form" name="userForm">
+            <div class="box-body">
+              <div class="form-group">
+                <label for="versao">Versão</label>
+                <input type="text" class="form-control" id="versao" name="versao" ng-model="TREI.modalForm.model.versao"
+                  required>
+                <p class="text-danger" ng-if="TREI.modalForm.validations.versao"
+                  ng-bind="TREI.modalForm.validations.versao"></p>
+              </div>
+              <div class="form-group">
+                <label for="nome">Nome</label>
+                <input type="text" class="form-control" id="nome" name="nome" ng-model="TREI.modalForm.model.nome"
+                  required>
+                <p class="text-danger" ng-if="TREI.modalForm.validations.nome"
+                  ng-bind="TREI.modalForm.validations.nome"></p>
+              </div>
+              <div class="form-group">
+                <label for="selectFormat">Formato</label>
+                <select name="tipo" id="selectFormat" class="form-control" ng-model="TREI.modalForm.model.tipo"
+                  required>
+                  <option ng-repeat="fmt in TREI.formatOptions" ng-value="fmt.value">{{fmt.label}}</option>
+                </select>
+                <p class="text-danger" ng-if="TREI.modalForm.validations.tipo"
+                  ng-bind="TREI.modalForm.validations.tipo"></p>
+              </div>
+              <div class="form-group">
+                <label for="nome">Descrição</label>
+                <textarea class="form-control" name="descricao" id="descricao" cols="30" rows="5"
+                  ng-model="TREI.modalForm.model.descricao"></textarea>
+              </div>
+              <div class="form-group" ng-show="!TREI.isPrimeiraVersao">
+                <input type="checkbox" id="copyContent" ng-model="TREI.modalForm.model.copyContent">
+                <label for="copyContent">Desejo copiar o conteúdo da versão ativa de treinamento</label>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-warning pull-left"
+            ng-click="TREI.modalForm.clearModalForm()">Limpar</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+          <button type="button" class="btn btn-success" ng-click="TREI.modalForm.save()">Salvar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="modalDetail" tabindex="-1" role="dialog" aria-labelledby="modalForm">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content" ng-if="TREI.versaoDetail">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h4>Detalhes de
+            <b>{{TREI.versaoDetail.nome}}</b>
+          </h4>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-xs-12">
+              <p>
+                <strong>Nome:</strong>
+                <span ng-bind="TREI.versaoDetail.nome"></span>
+              </p>
+              <p>
+                <strong>Formato:</strong>
+                <span ng-bind="TREI.versaoDetail.tipo"></span>
+              </p>
+              <p>
+                <strong>Versão: </strong>
+                <span ng-bind="TREI.versaoDetail.versao"></span>
+              </p>
+              <p>
+                <strong>Descrição: </strong>
+                <span ng-bind="TREI.versaoDetail.descricao"></span>
+              </p>
+              <p>
+                <strong>Data Criação: </strong>
+                <span ng-bind="TREI.versaoDetail.insertedAt | date : 'dd/MM/yyyy \'às\' HH:mm'"></span>
+              </p>
+            </div>
+            <div class="col-xs-12"
+              ng-show="TREI.versaoDetail.uploadStatus === 'NONE' || TREI.versaoDetail.uploadStatus === 'ERROR'">
+              <form name="formQuiz">
+                <label for="quiz">Enviar novo vídeo:</label>
+                <div class="form-group" ng-if="TREI.versaoDetail.tipo === 'HTML'">
+                  <input type="file" id="quiz" accept=".zip" file-model="TREI.fileModel">
+                  <p class="help-block">Somente arquivos comprimidos no formato ZIP.</p>
+                </div>
+                <div class="form-group" ng-if="TREI.versaoDetail.tipo === 'MP4'">
+                  <input type="file" id="quiz" accept=".mp4" file-model="TREI.fileModel" multiple="true">
+                  <p class="help-block">Somente arquivos no formato MP4.</p>
+                </div>
+                <div class="progress" ng-show="TREI.progress.visible">
+                  <div id="progressQuiz2" class="progress-bar progress-bar-striped" role="progressbar"
+                    ng-class="{'active': TREI.progress.keep}">
+                  </div>
+                </div>
+                <button class="btn btn-primary" ng-click="TREI.sendQuiz(TREI.fileModel)"
+                  ng-disabled="TREI.progress.visible">
+                  <i class="fa fa-upload"></i>
+                  Enviar</button>
+                <button class="btn btn-info" ng-click="TREI.getVideos()" ng-show="TREI.progress.complete === 100"
+                  ng-disabled="TREI.requestLinks" title="Atualizar visualização">
+                  <i class="fa fa-refresh"></i>
+                  Atualizar</button>
+              </form>
+            </div>
+            <div ng-show="TREI.versaoDetail.uploadStatus === 'PENDING'">
+              <div class="col-xs-12">
+                <h3>O upload do treinamento está sendo processado e logo estará disponível.</h3>
+              </div>
+            </div>
+            <div ng-show="TREI.versaoDetail.uploadStatus === 'COMPLETE'">
+              <div ng-show="!TREI.updateVideo">
+                <div class="col-xs-12">
+                  <h4>Deseja atualizar o vídeo do treinamento?</h4>
+                  <button class="btn btn-sm btn-info" ng-click="TREI.validateUpdateVideo(true)" title="Atualizar treinamento">
+                    <i class="fa fa-refresh"></i>
+                    Atualizar</button>
+                </div>
+                <div class="col-xs-12">
+                  <h3>Visualização do quiz:</h3>
+                </div>
+                <div class="col-xs-12 text-justify" ng-show="TREI.versaoDetail.tipo === 'HTML'">
+                  <iframe id="curso" width="100%" height="658px"></iframe>
+                </div>
+                <div ng-show="TREI.versaoDetail.tipo === 'MP4'" class="modal-container">
+                  <video-treinamento videos="TREI.versaoDetail.links || []"></video-treinamento>
+                </div>
+              </div>
+              <div class="col-xs-12">
+                <form name="formQuiz" ng-show="TREI.updateVideo">
+                  <label for="quiz">Enviar novo vídeo:</label>
+                  <div class="form-group" ng-if="TREI.versaoDetail.tipo === 'HTML'">
+                    <input type="file" id="quiz" accept=".zip" file-model="TREI.fileModel">
+                    <p class="help-block">Somente arquivos comprimidos no formato ZIP.</p>
+                  </div>
+                  <div class="form-group" ng-if="TREI.versaoDetail.tipo === 'MP4'">
+                    <input type="file" id="quiz" accept=".mp4" file-model="TREI.fileModel" multiple="true">
+                    <p class="help-block">Somente arquivos no formato MP4.</p>
+                  </div>
+                  <div class="progress" ng-show="TREI.progress.visible">
+                    <div id="progressQuiz" class="progress-bar progress-bar-striped" role="progressbar"
+                      ng-class="{'active': TREI.progress.keep}">
+                    </div>
+                  </div>
+                  <button class="btn btn-primary" ng-click="TREI.sendQuiz(TREI.fileModel)"
+                    ng-disabled="TREI.progress.visible">
+                    <i class="fa fa-upload"></i>
+                    Enviar</button>
+                  <button class="btn btn-info" ng-click="TREI.getVideos()" ng-show="TREI.progress.complete === 100"
+                    ng-disabled="TREI.requestLinks" title="Atualizar visualização">
+                    <i class="fa fa-refresh"></i>
+                    Atualizar</button>
+                  <button class="btn btn-danger" ng-click="TREI.validateUpdateVideo(false)"
+                    ng-disabled="TREI.progress.visible" title="Cancelar">
+                    <i class="fa fa-close"></i>
+                    Cancelar</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">
+            <i class="fa fa-close"></i> Fechar </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="modalConfirmDel" tabindex="-1" role="dialog" aria-labelledby="modalForm"
+    data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click=""><span
+              aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">Confirme sua ação de exclusão</h4>
+        </div>
+        <div class="modal-body">
+          <label>
+            Tem certeza que deseja remover o Treinamento?
+          </label>
+          <br>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" data-dismiss="modal" ng-click="TREI.confirmRemove(false)">
+            <i class="fa fa-close"></i>
+            Não </button>
+          <button type="button" class="btn btn-danger" data-dismiss="modal" ng-click="TREI.confirmRemove(true)">
+            <i class="fa fa-check"></i> Sim </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-template>

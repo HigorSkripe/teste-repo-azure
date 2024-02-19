@@ -1,0 +1,465 @@
+<app-template app-ref="DILI.appRef">
+  <div class="row">
+    <form>
+      <div class="form-group col-md-4">
+        <label for="cpfCnpj">CPF/CNPJ/ID</label>
+        <input type="text" class="form-control" id="cpfCnpj" name="cpfCnpj" ng-model="DILI.model.cpfCnpj"
+          ng-change="DILI.mascara()">
+      </div>
+      <div class="form-group col-md-6">
+        <label for="nome">Nome</label>
+        <input type="text" class="form-control" id="nome" name="nome" placeholder="Nome" ng-model="DILI.model.nome">
+      </div>
+      <div class="form-group col-md-1">
+        <br>
+        <a type="submit" style="margin-top: 5px;" class="btn btn-primary" id="pesquisa" name="pesquisa"
+          ng-disabled="DILI.disabledPesquisarSalvar" ng-click="DILI.enviaPesquisa()">Pesquisar</a>
+      </div>
+      <div class="form-group col-md-1" ng-show="DILI.painelRespostas.suspensas">
+        <br>
+        <a type="submit" style="margin-top: 5px;" class="btn btn-success" id="salvar" name="salvar"
+          ng-disabled="DILI.disabledPesquisarSalvar" ng-click="DILI.salvar()">Salvar</a>
+      </div>
+    </form>
+  </div>
+  <div class="row">
+    <div class="col-xs-12">
+      <div class="box box-solid box-primary" ng-show="DILI.painelRespostas.punidas">
+        <div class="box-header with-border">
+          <h5 class="box-title">
+            {{DILI.painelRespostas.punidas.fonte.nome}}
+          </h5>
+        </div>
+        <div class="box-body small">
+          <h4 style="margin-top: 5px;margin-bottom: 10px;color: red"
+            ng-if="!DILI.painelRespostas.punidas.resultado.length">
+            Não obteve resultado na busca!</h4>
+          <table class="table table-condensed">
+            <tbody>
+              <tr>
+                <td>
+                  <strong>Tipo de Pessoa:</strong>
+                </td>
+                <td>
+                  {{DILI.painelRespostas.punidas.dadosPessoa.tipoPessoa}}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>{{DILI.painelRespostas.punidas.dadosPessoa.tipoCodigo}}:</strong>
+                </td>
+                <td>
+                  {{DILI.painelRespostas.punidas.dadosPessoa.codigoFormatado}}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>Nome Informado pelo Órgão Sancionador:</strong>
+                </td>
+                <td>
+                  {{DILI.painelRespostas.punidas.dadosPessoa.nomeSancionado}}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>Razão Social - Cadastro Receita:</strong>
+                </td>
+                <td>
+                  {{DILI.painelRespostas.punidas.dadosPessoa.razaoSocial}}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>Nome Fantasia - Cadastro Receita:</strong>
+                </td>
+                <td>
+                  {{DILI.painelRespostas.punidas.dadosPessoa.nomeFantasia}}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <table class="table table-condensed small">
+            <tfoot>
+              <tr>
+                <td>
+                  <strong>Quantidade de registros encontrados:</strong>
+                </td>
+                <td>
+                  {{DILI.painelRespostas.punidas.data.quantidadeResultados}}
+                </td>
+                <td>
+                  <strong>Data e Hora da consulta:</strong>
+                </td>
+                <td>
+                  {{DILI.painelRespostas.punidas.data.dataConsulta}}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>Última atualização do Sistema:</strong>
+                </td>
+                <td>
+                  {{DILI.painelRespostas.punidas.data.ultimaAtualizacao}}
+                </td>
+                <td></td>
+                <td></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+      <div class="box box-solid box-success small" ng-show="DILI.painelRespostas.punidas"
+        ng-repeat="resposta in DILI.painelRespostas.punidas.resultado">
+        <div class="box-header with-border">
+          <h6 class="box-title">
+            {{DILI.painelRespostas.punidas.fonte.detalhamento}}
+          </h6>
+        </div>
+        <div class="box-body" ng-show="DILI.painelRespostas.punidas.resultado.length > 0">
+          <table class="table table-condensed">
+            <tbody>
+              <tr>
+                <td>
+                  <strong>Tipo da sanção:</strong>
+                </td>
+                <td colspan="5">
+                  {{resposta.tipoSancao}}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>Fundamentação legal:</strong>
+                </td>
+                <td colspan="5">
+                  {{resposta.fundamentacaoLegal}}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>Descrição da fundamentação legal:</strong>
+                </td>
+                <td colspan="5">
+                  {{resposta.descricaoFundamentacaoLegal}}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>Data de início da sanção:</strong>
+                </td>
+                <td>
+                  {{resposta.dataInicioSancao}}
+                </td>
+                <td>
+                  <strong>Data de fim da sanção:</strong>
+                </td>
+                <td>
+                  {{resposta.dataFimSancao}}
+                </td>
+                <td>
+                  <strong>Data de publicação sanção:</strong>
+                </td>
+                <td>
+                  {{resposta.dataPublicacaoSancao}}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>Publicação:</strong>
+                </td>
+                <td>
+                  {{resposta.textoPublicacao}}
+                </td>
+                <td>
+                  <strong>Detalhamento do meio de publicação:</strong>
+                </td>
+                <td colspan="5">
+                  {{resposta.detalhamentoPublicacao}}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>Data do trânsito em julgado:</strong>
+                </td>
+                <td colspan="5">
+                  {{resposta.dataTransitadoJulgado}}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>Número do processo:</strong>
+                </td>
+                <td colspan="5">
+                  {{resposta.numeroProcesso}}
+                </td>
+              </tr>
+              <tr ng-show="resposta.abrangenciaDefinidaDecisaoJudicial">
+                <td>
+                  <strong>Abrangência definida em decisão judicial:</strong>
+                </td>
+                <td colspan="5">
+                  {{resposta.abrangenciaDefinidaDecisaoJudicial}}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>Órgão sancionador:</strong>
+                </td>
+                <td colspan="5">
+                  {{resposta.nomeOrgaoSancionador}}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>UF do órgão sancionador:</strong>
+                </td>
+                <td>
+                  {{resposta.ufOrgaoSancionador}}
+                </td>
+                <td>
+                  <strong>Endereço:</strong>
+                </td>
+                <td colspan="4">
+                  {{resposta.enderecoContato}}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>Contatos da origem da informação:</strong>
+                </td>
+                <td colspan="5">
+                  {{resposta.telefoneContato}}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>Data da informação:</strong>
+                </td>
+                <td colspan="5">
+                  {{resposta.dataOrigemInformacao}}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="box box-solid box-primary" ng-show="DILI.painelRespostas.suspensas">
+        <div class="box-header with-border">
+          <h5 class="box-title ">
+            {{DILI.painelRespostas.suspensas.fonte.nome}}
+          </h5>
+        </div>
+        <div class="box-body small">
+          <h4 style="margin-top: 5px;margin-bottom: 10px;color: red"
+            ng-if="!DILI.painelRespostas.suspensas.resultado.length">Não obteve resultado na busca!</h4>
+          <table class="table table-condensed">
+            <tbody>
+              <tr>
+                <td>
+                  <strong>Tipo de Pessoa:</strong>
+                </td>
+                <td>
+                  {{DILI.painelRespostas.suspensas.dadosPessoa.tipoPessoa}}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>{{DILI.painelRespostas.suspensas.dadosPessoa.tipoCodigo}}:</strong>
+                </td>
+                <td>
+                  {{DILI.painelRespostas.suspensas.dadosPessoa.codigoFormatado}}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>Nome Informado pelo Órgão Sancionador:</strong>
+                </td>
+                <td>
+                  {{DILI.painelRespostas.suspensas.dadosPessoa.nomeSancionado}}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>Razão Social - Cadastro Receita:</strong>
+                </td>
+                <td>
+                  {{DILI.painelRespostas.suspensas.dadosPessoa.razaoSocial}}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>Nome Fantasia - Cadastro Receita:</strong>
+                </td>
+                <td>
+                  {{DILI.painelRespostas.suspensas.dadosPessoa.nomeFantasia}}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <table class="table table-condensed small">
+            <tfoot>
+              <tr>
+                <td>
+                  <strong>Quantidade de registros encontrados:</strong>
+                </td>
+                <td>
+                  {{DILI.painelRespostas.suspensas.data.quantidadeResultados}}
+                </td>
+                <td>
+                  <strong>Data e Hora da consulta:</strong>
+                </td>
+                <td>
+                  {{DILI.painelRespostas.suspensas.data.dataConsulta}}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>Última atualização do Sistema:</strong>
+                </td>
+                <td>
+                  {{DILI.painelRespostas.suspensas.data.ultimaAtualizacao}}
+                </td>
+                <td></td>
+                <td></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+      <div class="box box-solid box-success small" ng-show="DILI.painelRespostas.suspensas"
+        ng-repeat="resposta in DILI.painelRespostas.suspensas.resultado">
+        <div class="box-header with-border">
+          <h6 class="box-title">
+            {{DILI.painelRespostas.suspensas.fonte.detalhamento}}
+          </h6>
+        </div>
+        <div class="box-body" ng-show="DILI.painelRespostas.suspensas.resultado.length > 0">
+          <table class="table table-condensed">
+            <tbody>
+              <tr>
+                <td>
+                  <strong>Tipo da sanção:</strong>
+                </td>
+                <td colspan="5">
+                  {{resposta.tipoSancao}}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>Fundamentação legal:</strong>
+                </td>
+                <td colspan="5">
+                  {{resposta.fundamentacaoLegal}}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>Descrição da fundamentação legal:</strong>
+                </td>
+                <td colspan="5">
+                  {{resposta.descricaoFundamentacaoLegal}}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>Data de início da sanção:</strong>
+                </td>
+                <td>
+                  {{resposta.dataInicioSancao}}
+                </td>
+                <td>
+                  <strong>Data de fim da sanção:</strong>
+                </td>
+                <td>
+                  {{resposta.dataFimSancao}}
+                </td>
+                <td>
+                  <strong>Data de publicação sanção:</strong>
+                </td>
+                <td>
+                  {{resposta.dataPublicacaoSancao}}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>Publicação:</strong>
+                </td>
+                <td>
+                  {{resposta.textoPublicacao}}
+                </td>
+                <td>
+                  <strong>Detalhamento do meio de publicação:</strong>
+                </td>
+                <td colspan="5">
+                  {{resposta.detalhamentoPublicacao}}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>Data do trânsito em julgado:</strong>
+                </td>
+                <td colspan="5">
+                  {{resposta.dataTransitadoJulgado}}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>Número do processo:</strong>
+                </td>
+                <td colspan="5">
+                  {{resposta.numeroProcesso}}
+                </td>
+              </tr>
+              <tr ng-show="resposta.abrangenciaDefinidaDecisaoJudicial">
+                <td>
+                  <strong>Abrangência definida em decisão judicial:</strong>
+                </td>
+                <td colspan="5">
+                  {{resposta.abrangenciaDefinidaDecisaoJudicial}}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>Órgão sancionador:</strong>
+                </td>
+                <td colspan="5">
+                  {{resposta.nomeOrgaoSancionador}}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>UF do órgão sancionador:</strong>
+                </td>
+                <td>
+                  {{resposta.ufOrgaoSancionador}}
+                </td>
+                <td>
+                  <strong>Endereço:</strong>
+                </td>
+
+                <td colspan="4">
+                  {{resposta.enderecoContato}}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>Contatos da origem da informação:</strong>
+                </td>
+                <td colspan="5">
+                  {{resposta.telefoneContato}}
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <strong>Data da informação:</strong>
+                </td>
+                <td colspan="5">
+                  {{resposta.dataOrigemInformacao}}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-template>

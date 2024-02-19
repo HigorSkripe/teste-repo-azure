@@ -1,0 +1,487 @@
+<app-template app-ref="DENU.appRef">
+  <style>
+    .tableFixHead {
+      overflow-y: auto;
+      height: 430px;
+    }
+
+    .tableFixHead thead th {
+      position: sticky;
+      background-color: lightgray;
+      top: 0;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    th,
+    td {
+      padding: 8px 16px;
+      border: 1px solid #ccc;
+    }
+
+    th {
+      background: #eee;
+    }
+  </style>
+  <div class="box box-primary">
+    <div class="box-header">
+      <h3 class="box-title">Todas as {{DENU.keyDenuncias}}</h3>
+    </div>
+    <div class="box-header">
+      <div class="form-group col-lg-2 col-md-2 col-sm-4 col-xs-4">
+        <label for="filiaisReport">Filial: </label>
+        <select id="filiaisReport" class="form-control" ng-model="DENU.filialSelected"
+          ng-disabled="DENU.initialProtocol.length > 0" ng-change=" DENU.updateFilialSelected()">
+          <option ng-repeat="filial in DENU.filiais" ng-value="filial">
+            {{filial.nome}}
+          </option>
+        </select>
+      </div>
+      <div class="form-group col-lg-2 col-md-2 col-sm-4 col-xs-4">
+        <label for="filiaisReport">Itens na página: </label>
+        <select id="filiaisReport" class="form-control" ng-model="DENU.pagination.limit"
+          ng-disabled="DENU.pagination.searchComplaints" ng-change=" DENU.updateFilialSelected()">
+          <option ng-repeat="limit in DENU.limits" ng-value="limit">
+            {{limit}}
+          </option>
+        </select>
+      </div>
+      <div class="form-group col-lg-2 col-md-2 col-sm-4 col-xs-4" style="margin-bottom: 50px; width: 66%;">
+        <label for="complaintSearch">Pesquisar: </label>
+        <div class="input-group">
+          <div class="input-group-btn">
+            <button class="btn btn-default" ng-disabled="DENU.initialProtocol.length > 0"><i
+                class="fa fa-search"></i></button>
+          </div>
+          <input type="text" name="search" class="form-control pull-right" style="width: 100%" placeholder="Pesquisar"
+            ng-model="DENU.pagination.search" ng-disabled="DENU.initialProtocol.length > 0"
+            ng-model-options='{ debounce: 1000 }' ng-change="DENU.pesquisar(DENU.pagination.search)">
+        </div>
+      </div>
+    </div>
+    <div>
+      <ul class="nav nav-tabs">
+        <li class="active">
+          <a ng-click="DENU.searchByStatus('aberto')" data-target="#tab-complaint" data-toggle="tab">Abertos
+            ({{DENU.pagination.aberto.count}})</a>
+        </li>
+        <li>
+          <a ng-click="DENU.searchByStatus('em_progresso')" data-target="#tab-complaint" data-toggle="tab">Em Progresso
+            ({{DENU.pagination.em_progresso.count}})</a>
+        </li>
+        <li>
+          <a ng-click="DENU.searchByStatus('fechado')" data-target="#tab-complaint" data-toggle="tab">Fechados
+            ({{DENU.pagination.fechado.count}})</a>
+        </li>
+      </ul>
+    </div>
+    <div class="box-body tabs-wrapper profile-tabs tab-content" id="tab-complaint">
+      <div class="tab-pane fade in active">
+        <div class="box-body table-responsive no-padding tableFixHead">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th style="width: 140px;">Protocolo</th>
+                <th style="width: 140px;">Filial</th>
+                <th style="width: 150px;">Data</th>
+                <th style="width: 150px;">Último Andamento</th>
+                <th style="width: 70px;">Status</th>
+                <th>{{DENU.keyDenuncia}}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="linkable" ng-repeat="denuncia in DENU.pagination[DENU.pagination.status].list"
+                ng-click="DENU.modalDenuncias.open(denuncia)">
+                <td ng-bind="denuncia.protocolo||'-'"></td>
+                <td ng-bind="denuncia.filial"></td>
+                <td ng-bind="denuncia.insertedAt | date:'dd/MM/yyyy \'às\' HH\'h\'mm\'m\''"></td>
+                <td ng-bind="denuncia.updatedAt | date:'dd/MM/yyyy \'às\' HH\'h\'mm\'m\''">
+                </td>
+                <td style="text-align: center;">
+                  <span class="label" style="font-size: .9em"
+                    ng-class="{'label-danger': denuncia.status==='aberto','label-success': denuncia.status==='fechado','label-warning': denuncia.status==='em_progresso'}">
+                    {{denuncia.status==='aberto'?'Aberto' : denuncia.status==='fechado' ? 'Fechado' : 'Em Progresso'}}
+                  </span>
+                </td>
+                <td ng-bind="(denuncia.problema | limitTo:DENU.showDenunciaProblemLimit)+'...'"></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="col-md-12">
+            <h3 class="help-block" ng-hide="DENU.pagination[DENU.pagination.status].list.length">Nenhum resultado
+              encontrado!</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="box-footer clearfix" ng-show="!DENU.initialProtocol">
+      <ul class="pagination pagination-sm no-margin pull-right">
+        <li ng-click="DENU.pagination.prev()" ng-class="{'disabled': DENU.pagination[DENU.pagination.status].page===0}">
+          <a href="#">«</a>
+        </li>
+        <li ng-repeat="page in DENU.pagination[DENU.pagination.status].range"
+          ng-class="{'disabled': DENU.pagination[DENU.pagination.status].page===page}"
+          ng-click="DENU.pagination.goTo(page)">
+          <a href="#" ng-bind="page+1"></a>
+        </li>
+        <li ng-click="DENU.pagination.next()"
+          ng-class="{'disabled': DENU.pagination[DENU.pagination.status].page===(DENU.pagination[DENU.pagination.status].totalPages-1)}">
+          <a href="#">»</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div class="col-md-12">
+    <button class="btn btn-primary btn-lg" ng-click="DENU.formModelReport.open(modalReport)">
+      <i class="fa fa-download"></i> Baixar Relatório das {{DENU.keyDenuncias}}
+    </button>
+  </div>
+  <div class="modal fade" id="modalReport" tabindex="-1" role="dialog" aria-labelledby="modalReport"
+    data-backdrop="static">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h4 class="modal-title">Baixar Relatório de {{DENU.keyDenuncias}}</h4>
+        </div>
+        <div class="modal-body">
+          <form ng-class="{'has-error': DENU.formErrors.hasError}" name="modalReport">
+            <div class="row">
+              <div class="col-sm-12 col-md-12">
+                <div class="form-group">
+                  <label for="reportFilial">Filial</label>
+                  <div id='reportFilial1'>
+                    <input type='text' class="form-control" ng-model="DENU.filialSelected.nome" id="reportFilial"
+                      ng-disabled="true" name="reportFilial">
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12 col-md-6">
+                <div class="form-group"
+                  ng-class="{'has-error': DENU.formModelReport.error.reportStartDate || DENU.formModelReport.error.startDateAfterToday}">
+                  <label for="reportStartDate">Data Início</label>
+                  <div class='input-group date' id='datetimepicker1'>
+                    <input type='text' class="form-control" ng-model="DENU.formModelReport.startDate"
+                      id="reportStartDate" name="reportStartDate" placeholder="__/__/____" required>
+                    <span class="input-group-addon">
+                      <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                  </div>
+                  <span class="control-label" ng-show="DENU.formModelReport.error.reportStartDate">* Campo
+                    requerido!</span>
+                  <span class="control-label" ng-show="DENU.formModelReport.error.startDateAfterToday">* 'Data Início'
+                    maior que a data de hoje!</span>
+                </div>
+              </div>
+              <div class="col-sm-12 col-md-6">
+                <div class="form-group"
+                  ng-class="{'has-error': DENU.formModelReport.error.reportEndDate || DENU.formModelReport.error.endDateMinor}">
+                  <label for="reportEndDate">Data Fim</label>
+                  <div class='input-group date' id='datetimepicker2'>
+                    <input type='text' class="form-control" ng-model="DENU.formModelReport.endDate" id="reportEndDate"
+                      name="reportEndDate" placeholder="__/__/____" required>
+                    <span class="input-group-addon">
+                      <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                  </div>
+                  <span class="control-label" ng-show="DENU.formModelReport.error.reportEndDate">* Campo
+                    requerido!</span>
+                  <span class="control-label" ng-show="DENU.formModelReport.error.endDateMinor">* 'Data Fim' menor
+                    que a 'Data Início'!</span>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12 col-md-12">
+                <div class="form-group">
+                  <span class="info">* O período das datas deve ser de no máximo
+                    {{DENU.formModelReport.reportRangeDate}} meses.</span>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12 col-md-12">
+                <div class="form-group" ng-class="{'has-error': DENU.formModelReport.startDateBigger}"
+                  ng-show="DENU.formModelReport.startDateBigger">
+                  <label>* A Data Início tem que ser menor do que a Data Fim.</label>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12 col-md-12">
+                <div class="form-group" ng-class="{'has-error': DENU.formModelReport.reportRangeDateBigger}"
+                  ng-show="DENU.formModelReport.reportRangeDateBigger">
+                  <label>* O período das datas não pode ser superior a
+                    {{DENU.formModelReport.reportRangeDate}} meses.</label>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <!-- <button class="btn btn-success" ng-click="DENU.formModelReport.generateReport('pdf')">
+            <i class="fa fa-download"></i>&nbsp; Relatório PDF
+          </button> -->
+          <button class="btn btn-info" ng-click="DENU.formModelReport.generateReport('csv')">
+            <i class="fa fa-download"></i>&nbsp; Relatório CSV
+          </button>
+          <button class="button btn btn-default" data-dismiss="modal">
+            <i class="fa fa-close"></i>&nbsp; Fechar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalDenuncias" tabindex="-1" role="dialog" aria-labelledby="modalDenuncias">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+              aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">Detalhes do(a) {{DENU.keyDenuncia}}
+            <strong class="text-uppercase"
+              ng-class="{'text-danger': DENU.modalDenuncias.model.status ==='aberto','text-success': DENU.modalDenuncias.model.status ==='fechado','text-warning': DENU.modalDenuncias.model.status ==='em_progresso'}">
+              {{DENU.modalDenuncias.model.status ==='aberto'?'Aberto' : DENU.modalDenuncias.model.status ==='fechado' ?
+              'Fechado' : 'Em Progresso'}}
+            </strong>
+          </h4>
+        </div>
+        <div class="modal-body">
+          <div class="row invoice-info">
+            <div class="col-xs-12 col-md-8 col-sm-8 invoice-col">
+              <b>Protocolo:</b> <span id="protocolo" ng-bind="DENU.modalDenuncias.model.protocolo"></span><br>
+              <b>Data e Hora:</b> <span id="data"
+                ng-bind="DENU.modalDenuncias.model.insertedAt | date : 'dd/MM/yyyy'"></span>
+              as <span id="hora" ng-bind="DENU.modalDenuncias.model.insertedAt | date : 'HH:mm:ss'"></span><br>
+              <b>Nome:</b> <span class="text-justify" id="nome"
+                ng-bind="DENU.modalDenuncias.model.nome||'Anônimo'"></span><br>
+              <b>Telefone:</b> <span class="text-justify" id="telefone"
+                ng-bind="DENU.modalDenuncias.model.telefone||'Anônimo'"></span><br>
+              <b>Email:</b> <span class="text-justify" id="email"
+                ng-bind="DENU.modalDenuncias.model.email||'Anônimo'"></span><br>
+              <div ng-show="DENU.modalDenuncias.model">
+                <b>Cidade:</b> <span class="text-justify" id="cidade"
+                  ng-bind="DENU.modalDenuncias.model.cidade"></span><br>
+              </div>
+              <div ng-show="DENU.modalDenuncias.model">
+                <b>Filial:</b> <span class="text-justify" id="filial"
+                  ng-bind="DENU.modalDenuncias.model.filial"></span><br>
+              </div>
+              <div ng-show="DENU.modalDenuncias.model">
+                <b>Departamento:</b> <span class="text-justify" id="departamento"
+                  ng-bind="DENU.modalDenuncias.model.departamento"></span><br>
+              </div>
+              <div ng-show="DENU.modalDenuncias.model">
+                <b>Tipo de relato:</b> <span class="text-justify" id="tipoRelato"
+                  ng-bind="DENU.modalDenuncias.model.tipoRelatoText"></span><br>
+              </div>
+              <br>
+            </div>
+            <div class="col-xs-4"></div>
+            <div class="form-group invoice-col col-xs-12 col-md-4 col-sm-4"
+              ng-show="DENU.modalDenuncias.model.documentos && DENU.modalDenuncias.model.documentos.length">
+              <button class="btn btn-info btn-flat btn-xs pull-right download-file" type="button"
+                ng-repeat="documento in DENU.modalDenuncias.model.documentos"
+                ng-click="DENU.downloadAnexo('complaint', documento, $index)" data-toggle="tooltip"
+                title="{{documento.originalname}}">
+                <i class="fa fa-download"></i>
+                Baixar anexo {{$index+1}}
+              </button>
+            </div>
+            <div class="form-group invoice-col col-xs-12 col-md-4 col-sm-4">
+              <button class="btn btn-success btn-flat btn-xs pull-right" type="button"
+                ng-click="DENU.downloadAndamento()" data-toggle="tooltip"
+                title="{{DENU.modalDenuncias.model.documento.originalname}}">
+                <i class="fa fa-download"></i>
+                Baixar Andamento do(a) {{DENU.keyDenuncia}}
+              </button>
+            </div>
+            <div class="col-xs-4"></div>
+            <div class="col-xs-12 col-md-12 invoice-col">
+              <b>{{DENU.doubtSuggestionComplimentText}}:</b>
+              <p class="text-justify" id="problema" ng-bind="DENU.modalDenuncias.model.problema"></p>
+            </div>
+            <div class="col-xs-12 col-md-12 invoice-col"
+              ng-hide="!DENU.modalDenuncias.model.fatoRelatado || DENU.doubtSuggestionComplimentSearch">
+              <b>Fatos Relatados:</b>
+              <p class="text-justify" id="fatoRelatado" ng-bind="DENU.modalDenuncias.model.fatoRelatado"></p>
+            </div>
+            <div class="col-xs-12 col-md-12 invoice-col"
+              ng-hide="!DENU.modalDenuncias.model.malfeitor || DENU.doubtSuggestionComplimentSearch">
+              <b>Suposto(s) {{DENU.keyMalfeitor}} envolvido(s):</b>
+              <p class="text-justify" id="malfeitor" ng-bind="DENU.modalDenuncias.model.malfeitor"></p>
+            </div>
+            <div class="col-xs-12 col-md-12 invoice-col"
+              ng-hide="!DENU.modalDenuncias.model.testemunha || DENU.doubtSuggestionComplimentSearch">
+              <b>Testemunha(s):</b>
+              <p class="text-justify" id="testemunha" ng-bind="DENU.modalDenuncias.model.testemunha"></p>
+            </div>
+            <div class="col-xs-12 col-md-12 invoice-col"
+              ng-hide="!DENU.modalDenuncias.model.evidencia || DENU.doubtSuggestionComplimentSearch">
+              <b>Evidência(s):</b>
+              <p class="text-justify" id="evidencia" ng-bind="DENU.modalDenuncias.model.evidencia"></p>
+            </div>
+            <div class="col-xs-12 col-md-12 invoice-col"
+              ng-hide="!DENU.modalDenuncias.model.informacaoRelevante || DENU.doubtSuggestionComplimentSearch">
+              <b>Informação Relevante ao Caso:</b>
+              <p class="text-justify" id="informacaoRelevante" ng-bind="DENU.modalDenuncias.model.informacaoRelevante">
+              </p>
+            </div>
+          </div>
+          <br>
+          <div class="row invoice-info">
+            <form name="formDenuncia">
+              <div class="form-group col-md-3 col-xs-12">
+                <label for="status">Status: </label>
+                <select id="status" class="form-control" ng-model="DENU.modalDenuncias.model.status">
+                  <option value="aberto">Aberto</option>
+                  <option value="em_progresso">Em progresso</option>
+                  <option value="fechado">Fechado</option>
+                </select>
+              </div>
+              <div class="form-group col-xs-12"
+                ng-class="{'col-md-5': DENU.modalDenuncias.model.status === 'fechado', 'col-md-9': DENU.modalDenuncias.model.status !== 'fechado'}">
+                <label for="responsavel">Responsável: </label>
+                <input class="form-control disabled" type="text" name="responsavel" id="responsavel"
+                  ng-model="DENU.modalDenuncias.model.responsavel" ng-disabled="DENU.modalDenuncias.model.responsavel">
+              </div>
+              <div class="form-group col-md-4 col-xs-6" ng-hide="DENU.modalDenuncias.model.status !== 'fechado'">
+                <label for="resultado">Resultado: </label>
+                <select id="resultado" class="form-control" ng-model="DENU.modalDenuncias.model.resultado">
+                  <option value="CODE 00 - NÃO APURADA">Code 00 - Não apurada</option>
+                  <option value="CODE 01 - IMPROCEDENTE">Code 01 - Improcedente</option>
+                  <option value="CODE 02 - PARCIALMENTE PROCEDENTE">Code 02 - Parcialmente procedente</option>
+                  <option value="CODE 03 - PROCEDENTE">Code 03 - Procedente</option>
+                </select>
+              </div>
+              <div class="form-group col-md-12 col-xs-12">
+                <label for="resposta">Resposta: </label>
+                <textarea class="form-control" name="resposta" id="resposta" cols="30" rows="5"
+                  ng-model="DENU.modalDenuncias.model.resposta" required></textarea>
+                <span class="control-label" ng-show="formDenuncia.resposta.$error.required">* Campo necessário para
+                  atualizar!</span>
+              </div>
+              <div class="form-group col-md-12">
+                <label for="documento">Adicionar anexo?</label>
+                <ul ng-show="DENU.threadFiles && DENU.threadFiles.length" id="threadFiles"
+                  class="file-list">
+                  <li ng-repeat="file in DENU.threadFiles">
+                    {{file.name}} &nbsp;<span class="fileError">{{file.sizeError ? ' * Arquivo maior que 2mb' : ''}}</span>
+                    <button ng-click="DENU.removeFile()" type="button" class="close" data-dismiss="alert"
+                      aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </li>
+                </ul>
+                <div class="input-group">
+                  <span class="input-group-btn">
+                    <div class="btn btn-default custom-file-uploader">
+                      <input type="file" id="documento" name="documento" file-model="DENU.threadFiles"
+                        accept=".avi, .jpg, .png, .bmp, .mp3. .mp4, .doc, .docx, .pdf"
+                        ng-on-change="DENU.changeFileInput()" />{{DENU.threadFiles.length ? 'Substituir anexo' : 'Adicionar anexo'}}
+                    </div>
+                  </span>
+                </div>
+                <span class="help-block">* Tamanho máximo do anexo: 2mb</span>
+              </div>
+              <div class="col-md-12" ng-show="DENU.threadFileError" style="margin-bottom: 10px">
+                <div class="alert alert-danger no-margin">
+                  <p>{{DENU.threadFileError}}</p>
+                </div>
+              </div>
+              <div class="form-group col-md-12 col-xs-12">
+                <input type="checkbox" id="visivel" ng-model="DENU.modalDenuncias.model.visivel">
+                <label for="visivel">Deixar visível para o(a) denunciante</label>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+          <button type="button" class="btn btn-success" ng-click="DENU.modalDenuncias.save()"
+            ng-disabled="formDenuncia.$invalid">Atualizar</button>
+          <br>
+          <div class="text-justify" style="margin-top: 20px" ng-show="DENU.modalDenuncias.threads.length">
+            <ul class="timeline">
+              <li class="time-label">
+                <span class="bg-red">
+                  {{(DENU.modalDenuncias.model.lastResponse || DENU.modalDenuncias.model.insertedAt) | date : 'dd MMM
+                  yyyy'}}
+                </span>
+              </li>
+              <li ng-repeat="resposta in DENU.modalDenuncias.threads">
+                <i class="fa fa-envelope bg-blue"></i>
+                <i
+                  ng-class="{'fa fa-exclamation-circle bg-red': resposta.status==='aberto','fa fa-thumbs-up bg-green': resposta.status==='fechado','fa fa-eye bg-yellow': resposta.status==='em_progresso','fa fa-plus': resposta.isTramitacao}"></i>
+                <div class="timeline-item"
+                  ng-style="DENU.modalDenunciaThreadStyle(resposta.isTramitacao, resposta.visivel)">
+                  <span class="time"><i class="fa fa-clock-o"></i> {{resposta.insertedAt | date : 'dd/MM/yyyy \'às\'
+                    HH\'h\'mm\'m\' '}}</span>
+                  <h3 class="timeline-header" ng-hide="resposta.isTramitacao">Usuário
+                    <b>{{resposta.colaborador.nome}}</b>
+                    alterou o(a) {{DENU.keyDenuncia}}
+                    para
+                    <strong class="text-uppercase"
+                      ng-class="{'text-danger': resposta.status ==='aberto','text-success': resposta.status ==='fechado','text-warning': resposta.status ==='em_progresso'}">
+                      {{resposta.status ==='aberto'?'Aberto' : resposta.status ==='fechado' ? 'Fechado' : 'Em
+                      Progresso'}}
+                    </strong>
+                    <i class="fa" ng-class="{ 'fa-lock': !resposta.visivel, 'fa-unlock': resposta.visivel }"
+                      ng-hide="resposta.isTramitacao" ng-click="DENU.changeComplaintThread(resposta)"
+                      title="{{resposta.visivel ? 'Visível para o denunciante' : 'Visível apenas para os administradores'}}"></i>
+                  </h3>
+                  <h3 ng-show="resposta.isTramitacao" class="timeline-header">
+                    Nova informação adicionada
+                  </h3>
+                  <div class="timeline-body">
+                    {{resposta.texto}}
+                  </div>
+                  <div class='timeline-body'
+                    ng-hide="resposta.isTramitacao || resposta.status !== 'fechado' || !resposta.resultado">
+                    <i>Resultado: {{resposta.resultado}}</i>
+                  </div>
+                  <div class='timeline-footer' ng-hide="resposta.isTramitacao">
+                    <i>-Responsável {{resposta.responsavel}}</i>
+                  </div>
+                  <div style="color: #999; text-align: right;" ng-hide="!resposta.updatedAt">Visibilidade alterada para
+                    {{resposta.visivel ? 'visível' : 'invisível'}} por <b>{{resposta.updatedUser}}</b> em <i
+                      class="fa fa-clock-o"></i> {{resposta.updatedAt | date : 'dd/MM/yyyy \'às\' HH\'h\'mm\'m\' '}}
+                  </div>
+                  <div class='timeline-footer'
+                    ng-show="resposta.isTramitacao && resposta.documentos && resposta.documentos.length > 0">
+                    <a class="btn btn-info btn-flat btn-xs" type="button" ng-repeat="documento in resposta.documentos"
+                      ng-click="DENU.downloadAnexo('proceeding', resposta, $index)" target="_blank"
+                      data-toggle="tooltip" title="{{documento.originalname}}">
+                      <i class="fa fa-download"></i>
+                      Baixar anexo {{$index + 1}}
+                    </a>
+                  </div>
+                  <div class='timeline-footer'
+                    ng-hide="resposta.isTramitacao && resposta.files && resposta.files.length > 0">
+                    <a class="btn btn-info btn-flat btn-xs" type="button" ng-repeat="file in resposta.files"
+                      ng-click="DENU.downloadAnexo('thread', resposta)" target="_blank"
+                      data-toggle="tooltip" title="{{file.originalname}}">
+                      <i class="fa fa-download"></i>
+                      Baixar anexo
+                    </a>
+                  </div>
+                </div>
+              </li>
+              <li>
+                <i class="fa fa-clock-o"></i>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-template>

@@ -1,0 +1,382 @@
+<app-template app-ref="PRER.appRef">
+  <div class="col-xs-12">
+    <div class="form-group">
+      <label for="PRER.dropGrupos">Grupo de Usuários</label>
+      <select name="dropGrupos" id="PRER.dropGrupos" name="PRER.dropGrupos" ng-change="PRER.update()"
+        class="form-control" ng-model="PRER.selectedGrupo" required>
+        <option ng-repeat="item in PRER.dropGrupos" value="{{item.nome}}">{{item.nome}}</option>
+      </select>
+    </div>
+  </div>
+  <div class="col-xs-12">
+    <div class="box">
+      <div class="box-header">
+        <h3 class="box-title">Colaboradores</h3>
+        <div class="box-tools">
+          <div class="input-group">
+            <input ng-model="PRER.pagination.search" type="text" name="table_search"
+              class="form-control input-sm pull-right" ng-change="PRER.pesquisar(PRER.pagination.search)"
+              style="width: 150px;" placeholder="Pesquisar">
+            <div class="input-group-btn">
+              <button class="btn btn-sm btn-default">
+                <i class="fa fa-search"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="box-header">
+        <div class="form-group col-lg-2 col-md-2 col-sm-4 col-xs-4">
+          <label for="filialUsers">Filial: </label>
+          <select id="filialUsers" class="form-control" ng-model="PRER.filialSelected" ng-change="PRER.updateFilial()">
+            <option ng-repeat="filial in PRER.filiaisSearch" ng-value="filial">
+              {{filial.nome}}
+            </option>
+          </select>
+        </div>
+      </div>
+      <div class="box-body table-responsive no-padding">
+        <table class="table table-hover">
+          <thead>
+            <tr class="orderby">
+              <th ng-click="PRER.pagination.orderBy('user_name')">Nome
+                <i class="fa" ng-show="PRER.pagination.order.predicate=='user_name'"
+                  ng-class="{'fa-sort-desc': PRER.pagination.order.reverse, 'fa-sort-up': !PRER.pagination.order.reverse}"></i>
+              </th>
+              <th ng-click="PRER.pagination.orderBy('user_email')">CPF
+                <i class="fa" ng-show="PRER.pagination.order.predicate=='user_email'"
+                  ng-class="{'fa-sort-desc': PRER.pagination.order.reverse, 'fa-sort-up': !PRER.pagination.order.reverse}"></i>
+              </th>
+              <th style="width: 23%; max-width: 23%;" ng-click="PRER.pagination.orderBy('preregister_email')">Email
+                <i class="fa" ng-show="PRER.pagination.order.predicate=='preregister_email'"
+                  ng-class="{'fa-sort-desc': PRER.pagination.order.reverse, 'fa-sort-up': !PRER.pagination.order.reverse}"></i>
+              </th>
+              <th style="width: 10%; min-width: 10%;" ng-click="PRER.pagination.orderBy('preregister_branch_name')">
+                Filial
+                <i class="fa" ng-show="PRER.order.predicate=='preregister_branch_name'"
+                  ng-class="{'fa-sort-desc': PRER.order.reverse, 'fa-sort-up': !PRER.order.reverse}"></i>
+              </th>
+              <th ng-hide="!PRER.secaoHabilitada" ng-click="PRER.orderBy('preregister_section_name')">
+                {{PRER.secaoChaveNome}}
+                <i class="fa" ng-show="PRER.pagination.orderBy.key==='preregister_section_name'"
+                  ng-class="{'fa-sort-desc': PRER.pagination.orderBy.order === 'desc', 'fa-sort-up': !PRER.pagination.orderBy.order === 'asc'}"></i>
+              </th>
+              <th style="width: 15%; max-width: 15%;" ng-click="PRER.pagination.orderBy('created_at')">E-mail enviado
+                em:
+                <i class="fa" ng-show="PRER.pagination.order.predicate=='created_at'"
+                  ng-class="{'fa-sort-desc': PRER.pagination.order.reverse, 'fa-sort-up': !PRER.pagination.order.reverse}"></i>
+              </th>
+            </tr>
+          </thead>
+          <thead>
+            <tr>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="preUser in PRER.pagination.list">
+              <td ng-bind="preUser.nome"></td>
+              <td ng-bind="preUser.cpf"></td>
+              <td ng-bind="preUser.email"></td>
+              <td ng-bind="preUser.filial"></td>
+              <td ng-hide="!PRER.secaoHabilitada" ng-bind="preUser.secao"></td>
+              <td ng-bind="preUser.insertedAt | date : 'dd/MM/yyyy \'às\' HH\'h\'mm\'m\' '"></td>
+              <td>
+                <button ng-disabled="PRER.sendingRequest" type="button" class="btn btn-primary btn-sm" id="{{'ticket_'+preUser.id}}"
+                  ng-click="PRER.resendInvite(preUser)" style="margin-right: 1px;" title="Reenviar convite"><i class="fa fa-mail-forward"></i>
+                </button>
+                <button ng-disabled="PRER.sendingRequest" ng-bootbox-confirm="Tem certeza que deseja apagar o pré-registro '{{preUser.email}}'?"
+                  ng-bootbox-confirm-action="PRER.deletePreUser(preUser)" class="btn btn-danger btn-sm">
+                  <i class="fa fa-trash-o"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="padding-left: 5px;" class="control-label" ng-hide="PRER.pagination.list.length">
+          Nenhum resultado encontrado.
+        </p>
+      </div>
+      <div class="box-footer clearfix">
+        <ul class="pagination pagination-sm no-margin pull-right">
+          <li ng-click="PRER.pagination.prev()" ng-class="{'disabled': PRER.pagination.page===0}"><a href="#">«</a>
+          </li>
+          <li ng-repeat="page in PRER.pagination.range" ng-class="{'disabled': PRER.pagination.page===page}"
+            ng-click="PRER.pagination.goTo(page)">
+            <a href="#" ng-bind="page+1"></a>
+          </li>
+          <li ng-click="PRER.pagination.next()"
+            ng-class="{'disabled': PRER.pagination.page===(PRER.pagination.totalPages-1)}"><a href="#">»</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="col-xs-12">
+    <div class="form-group">
+      <button class="btn btn-primary" ng-click="PRER.openModalFormSingle()">
+        <i class="fa fa-plus"></i>&nbsp; Adicionar único
+      </button>
+      <button class="btn btn-info" ng-click="PRER.openModalFormMulti()">
+        <i class="fa fa-list-ol"></i>&nbsp; Adicionar múltiplos
+      </button>
+    </div>
+  </div>
+  <div class="modal fade" id="modalFormSingle" tabindex="-1" role="dialog" aria-labelledby="modalFormSingle"
+    data-backdrop="static">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h4 class="modal-title">Adicionar pré-cadastro</h4>
+        </div>
+        <div class="modal-body">
+          <form name="singleForm">
+            <div class="form-group" ng-class="{'has-error': PRER.modalFormSingle.error.grupoId}">
+              <label for="PRER.modalFormSingle.grupoId">Grupo de Usuários</label>
+              <select id="PRER.modalFormSingle.grupoId" name="PRER.modalFormSingle.grupoId" class="form-control"
+                ng-model="PRER.modalFormSingle.grupoId" ng-disabled="PRER.filialSelected.id"
+                ng-change="PRER.changeGroup('modalFormSingle')" required>
+                <option ng-repeat="grupo in PRER.fullGroups" value="{{grupo.id}}">{{grupo.nome}}</option>
+              </select>
+              <span class="control-label" ng-show="PRER.modalFormSingle.error.grupoId">* Campo requerido!</span>
+            </div>
+            <div class="form-group" ng-class="{'has-error': PRER.modalFormSingle.error.filialId}">
+              <label for="PRER.modalFormSingle.filialId">Filial</label>
+              <select id="PRER.modalFormSingle.filialId" name="PRER.modalFormSingle.filialId" class="form-control"
+                ng-model="PRER.modalFormSingle.filialId" ng-disabled="PRER.filialSelected.id"
+                ng-change="PRER.changeBranch('modalFormSingle', PRER.modalFormSingle.filialId)" required>
+                <option ng-repeat="filial in PRER.branches" value="{{filial.id}}">{{filial.nome}}</option>
+              </select>
+              <span class="control-label" ng-show="PRER.modalFormSingle.error.filialId">* Campo requerido!</span>
+            </div>
+            <div class="form-group">
+              <label for="PRER.modalFormSingle.secaoId">{{PRER.secaoChaveNome}}</label>
+              <select id="PRER.modalFormSingle.secaoId" name="PRER.modalFormSingle.secaoId" class="form-control"
+                ng-model="PRER.modalFormSingle.secaoId">
+                <option ng-repeat="section in PRER.sections" value="{{section.id}}">{{section.nome}}</option>
+              </select>
+            </div>
+            <div class="form-group" ng-class="{'has-error': singleForm.nome.$error || PRER.modalFormSingle.error.nome}">
+              <label for="PRER.modalFormSingle.nome">Nome Completo</label>
+              <input type="text" class="form-control" id="PRER.modalFormSingle.nome" name="PRER.modalFormSingle.nome"
+                ng-model="PRER.modalFormSingle.nome" ng-blur="PRER.nomeValidate()" required autocomplete="off">
+              <span class="control-label"
+                ng-show="singleForm.nome.$error.pattern || PRER.modalFormSingle.error.nome">Nome
+                inválido!</span>
+            </div>
+            <div class="form-group" ng-class="{'has-error': singleForm.cpf.$error || PRER.modalFormSingle.error.cpf}">
+              <label for="PRER.modalFormSingle.cpf">CPF</label>
+              <input type="text" class="form-control" id="PRER.modalFormSingle.cpf" name="PRER.modalFormSingle.cpf"
+                ng-model="PRER.modalFormSingle.cpf" ng-blur="PRER.cpfValidate()" ui-br-cpf-mask
+                ng-change="PRER.cpfValidate()" required autocomplete="off">
+              <span class="control-label" ng-show="singleForm.cpf.$error.pattern || PRER.modalFormSingle.error.cpf">CPF
+                inválido!</span>
+            </div>
+            <div class="form-group"
+              ng-class="{'has-error': singleForm.email.$error || PRER.modalFormSingle.error.email}">
+              <label for="PRER.modalFormSingle.email">Email</label>
+              <input type="email" class="form-control" id="PRER.modalFormSingle.email" name="PRER.modalFormSingle.email"
+                ng-model="PRER.modalFormSingle.email" ng-change="PRER.emailValidate()" ng-blur="PRER.emailValidate()"
+                ng-pattern="/^([0-9a-zA-Z+]|[-_\\.\:])+@([0-9a-zA-Z]([-_\\.]*[0-9a-zA-Z]+)*)[\\.]([a-zA-Z]{2,9})$/"
+                required autocomplete="off">
+              <span class="control-label"
+                ng-show="singleForm.email.$error.pattern || PRER.modalFormSingle.error.email">Email inválido!</span>
+            </div>
+            <div class="form-group">
+              <label for="informProgram">O usuário realizará o treinamento em um dos programas anteriores?<i
+                  style="font-size: .7em" class="fa text-danger"></i></label>
+              <br>
+              <label class="radio-inline"><input id="informProgram" type="radio"
+                  ng-disabled="PRER.programas.length === 0" ng-model="PRER.modalFormSingle.informProgram"
+                  name="informProgram" value="true">Sim</label>
+              <label class="radio-inline"><input id="informProgram2" type="radio"
+                  ng-model="PRER.modalFormSingle.informProgram" name="informProgram" value="false">Não</label>
+            </div>
+            <div class="form-group" ng-if="PRER.modalFormSingle.informProgram === 'true'">
+              <label for="informProgram">Selecione os programas que o usuário realizará <i style="font-size: .7em"
+                  class="fa fa-asterisk text-danger"></i></label>
+              <select id="programas-single" name="programas-single" class="form-control" ng-model="PRER.programSelected"
+                ng-change="PRER.addProgramList(PRER.programSelected)">
+                <option ng-repeat="program in PRER.programas" ng-value="program">
+                  {{program.versao}} - {{program.nome}}</option>
+              </select>
+              </br>
+              OBS: Se o programa ativo não for selecionado, por padrão ele será o último a ser realizado.
+            </div>
+            <table class="table table-hover"
+              ng-show="PRER.selectedPrograms.length && PRER.modalFormSingle.informProgram === 'true'">
+              <thead>
+                <tr style="background-color: #C1C1C1">
+                  <th></th>
+                  <th>Ordem</th>
+                  <th>Programa</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="program in PRER.selectedPrograms track by $index">
+                  <th class="col-sm-2">
+                    <button type="button" class="btn" style="border: solid 1px #C1C1C1"
+                      ng-click="PRER.sortProgram(program, 'up')">
+                      <i class="fa fa-sort-up"></i>
+                    </button>&nbsp;
+                    <button type="button" class="btn" style="border: solid 1px #C1C1C1"
+                      ng-click="PRER.sortProgram(program, 'down')">
+                      <i class="fa fa-sort-down"></i>
+                    </button>
+                  </th>
+                  <th class="col-sm-2">{{$index + 1}}º.</label></th>
+                  <th class="col-sm-7">{{program.versao}} - {{program.nome}}</label></th>
+                  <th class="col-sm-1">
+                    <button type="button" class="btn btn-danger btn-sm" id="{{'del_'+user.id}}"
+                      ng-click="PRER.removeProgramList(program)">
+                      <i class="fa fa-trash"></i>
+                    </button>
+                  </th>
+                </tr>
+              </tbody>
+            </table>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-success" ng-if="PRER.selectedPrograms.length < 2" ng-disabled="PRER.sendingPreRegister"
+            ng-click="PRER.saveSingle()">
+            <i class="fa fa-save"></i>&nbsp; Salvar
+          </button>
+          <button ng-bootbox-confirm="A ordem de treinamento está correta?" ng-if="PRER.selectedPrograms.length > 1"
+            ng-disabled="PRER.sendingPreRegister" ng-bootbox-confirm-action="PRER.saveSingle()" class="btn btn-success">
+            <i class="fa fa-save"></i>&nbsp; Salvar
+          </button>
+          <button class="button btn btn-default" data-dismiss="modal">
+            <i class="fa fa-close"></i>&nbsp; Fechar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="modalFormMulti" tabindex="-1" role="dialog" aria-labelledby="modalFormMulti"
+    data-backdrop="static">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-disabled="PRER.progress.keep">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h4 class="modal-title">Adicionar múltiplos pré-cadastros</h4>
+        </div>
+        <div class="modal-body">
+          <form name="multipleForm">
+            <div class="form-group" ng-class="{'has-error': PRER.modalFormMulti.error.grupoId}">
+              <label for="PRER.modalFormMulti.grupoId">Grupo de Usuários</label>
+              <select id="PRER.modalFormMulti.grupoId" name="PRER.modalFormMulti.grupoId" class="form-control"
+                ng-model="PRER.modalFormMulti.grupoId" ng-disabled="PRER.filialSelected.id"
+                ng-change="PRER.changeGroup('modalFormMulti')" required>
+                <option ng-repeat="grupo in PRER.fullGroups" value="{{grupo.id}}">{{grupo.nome}}</option>
+              </select>
+              <span class="control-label" ng-show="PRER.modalFormMulti.error.grupoId">* Campo requerido!</span>
+            </div>
+            <div class="form-group" ng-class="{'has-error': PRER.modalFormMulti.error.filialId}">
+              <label for="PRER.modalFormMulti.filialId">Filial</label>
+              <select id="PRER.modalFormMulti.filialId" name="PRER.modalFormMulti.filialId" class="form-control"
+                ng-model="PRER.modalFormMulti.filialId" ng-disabled="PRER.filialSelected.id"
+                ng-change="PRER.changeBranch('modalFormMulti', PRER.modalFormMulti.filialId)" required>
+                <option ng-repeat="filial in PRER.branches" value="{{filial.id}}">{{filial.nome}}</option>
+              </select>
+              <span class="control-label" ng-show="PRER.modalFormMulti.error.filialId">* Campo requerido!</span>
+            </div>
+            <div class="form-group">
+              <label for="PRER.modalFormMulti.secaoId">{{PRER.secaoChaveNome}}</label>
+              <select id="PRER.modalFormMulti.secaoId" name="PRER.modalFormMulti.secaoId" class="form-control"
+                ng-model="PRER.modalFormMulti.secaoId">
+                <option ng-repeat="section in PRER.sections" value="{{section.id}}">{{section.nome}}</option>
+              </select>
+            </div>
+            <div class="form-group" ng-class="{'has-error': multipleForm.file.$invalid}">
+              <label for="PRER.modalFormMulti.fileModel">Emails</label>
+              <input type="file" name="PRER.modalFormMulti.fileModel" id="PRER.modalFormMulti.fileModel"
+                accept="text/csv" file-model="PRER.modalFormMulti.fileModel" required>
+              <br><span class="control-label">* Apenas arquivo no formato CSV é aceito.</span>
+              <br><span class="control-label">* Padrão esperado dos dados: nome,cpf,e-mail</span>
+              <br><span class="control-label">* Quaisquer dados fora do padrão não serão processados.</span>
+              <br>
+              <div class="progress" ng-show="PRER.progress.visible">
+                <div id="progressQuiz" class="progress-bar progress-bar-striped" role="progressbar"
+                  ng-class="{'active': PRER.progress.keep}">
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="informProgram">Os usuários realizarão o treinamento em um dos programas anteriores?<i
+                  style="font-size: .7em" class="fa  text-danger"></i></label>
+              <br>
+              <label class="radio-inline"><input id="informProgram" type="radio"
+                  ng-disabled="PRER.programas.length === 0" ng-model="PRER.modalFormMulti.informProgram"
+                  name="informProgram" value="true">Sim</label>
+              <label class="radio-inline"><input id="informProgram2" type="radio"
+                  ng-model="PRER.modalFormMulti.informProgram" name="informProgram" value="false">Não</label>
+            </div>
+            <div class="form-group" ng-if="PRER.modalFormMulti.informProgram === 'true'">
+              <label for="informProgram">Selecione os programas que os usuários realizarão<i style="font-size: .7em"
+                  class="fa fa-asterisk text-danger"></i></label>
+              <select id="programas-multi" name="programas-multi" class="form-control" ng-model="PRER.programSelected"
+                ng-change="PRER.addProgramList(PRER.programSelected)">
+                <option ng-repeat="program in PRER.programas" ng-value="program">
+                  {{program.versao}} - {{program.nome}}</option>
+              </select>
+              OBS: Se o programa ativo não for selecionado, por padrão ele será o último a ser realizado.
+            </div>
+            <table class="table table-hover"
+              ng-show="PRER.selectedPrograms.length && PRER.modalFormMulti.informProgram === 'true'">
+              <thead>
+                <tr style="background-color: #C1C1C1">
+                  <th></th>
+                  <th>Ordem</th>
+                  <th>Programa</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="program in PRER.selectedPrograms track by $index">
+                  <th class="col-sm-2">
+                    <button type="button" class="btn" style="border: solid 1px #C1C1C1"
+                      ng-click="PRER.sortProgram(program, 'up')">
+                      <i class="fa fa-sort-up"></i>
+                    </button>&nbsp;
+                    <button type="button" class="btn" style="border: solid 1px #C1C1C1"
+                      ng-click="PRER.sortProgram(program, 'down')">
+                      <i class="fa fa-sort-down"></i>
+                    </button>
+                  </th>
+                  <th class="col-sm-2">{{$index + 1}}º.</label></th>
+                  <th class="col-sm-7">{{program.versao}} - {{program.nome}}</label></th>
+                  <th class="col-sm-1">
+                    <button type="button" class="btn btn-danger btn-sm" id="{{'del_'+user.id}}"
+                      ng-click="PRER.removeProgramList(program)">
+                      <i class="fa fa-trash"></i>
+                    </button>
+                  </th>
+                </tr>
+              </tbody>
+            </table>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-success" ng-if="PRER.selectedPrograms.length < 2"
+            ng-disabled="PRER.sendingPreRegister || PRER.modalFormMulti.fileModel===null || multipleForm.$invalid"
+            ng-click="PRER.sendFile()">
+            <i class="fa fa-send"></i>&nbsp; Enviar
+          </button>
+          <button ng-bootbox-confirm="A ordem de treinamento está correta?" ng-if="PRER.selectedPrograms.length > 1"
+            ng-disabled="PRER.sendingPreRegister || PRER.modalFormMulti.fileModel===null || multipleForm.$invalid"
+            ng-bootbox-confirm-action="PRER.sendFile()" class="btn btn-success">
+            <i class="fa fa-send"></i>&nbsp; Enviar
+          </button>
+          <button class="button btn btn-default" data-dismiss="modal" ng-disabled="PRER.progress.keep">
+            <i class="fa fa-close"></i>&nbsp; Fechar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-template>

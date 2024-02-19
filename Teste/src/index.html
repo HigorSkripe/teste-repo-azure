@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html lang="pt" ng-app="eticca" ng-strict-di class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html lang="pt" ng-app="eticca" ng-strict-di class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html lang="pt" ng-app="eticca" ng-strict-di class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html lang="pt" ng-app="eticca" ng-strict-di class="no-js">
+  <!--<![endif]-->
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Language" content="pt-br" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <base href="/" />
+    <title>Eticca App</title>
+    <meta name="description" content="Portal Compliance" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script
+      src="https://cdn.jsdelivr.net/npm/pace-js@latest/pace.min.js"
+      data-pace-options='{ "restartOnPushState": true, "restartOnRequestAfter": true }'
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/pace-js@latest/pace-theme-default.min.css"
+    />
+    <style>
+      .pace {
+        -webkit-pointer-events: none !important;
+        pointer-events: none !important;
+        -webkit-user-select: none !important;
+        -moz-user-select: none !important;
+        user-select: none !important;
+      }
+
+      .pace-inactive {
+        display: none !important;
+      }
+
+      .pace .pace-progress {
+        background: #fff !important;
+      }
+
+      .pace .pace-progress-inner {
+        display: block !important;
+        position: absolute !important;
+        right: 0px !important;
+        width: 100px !important;
+        height: 100% !important;
+        box-shadow: 0 0 10px #fff, 0 0 5px #fff !important;
+        opacity: 1 !important;
+        -webkit-transform: rotate(3deg) translate(0px, -4px) !important;
+        -moz-transform: rotate(3deg) translate(0px, -4px) !important;
+        -ms-transform: rotate(3deg) translate(0px, -4px) !important;
+        -o-transform: rotate(3deg) translate(0px, -4px) !important;
+        transform: rotate(3deg) translate(0px, -4px) !important;
+      }
+
+      .pace .pace-activity {
+        display: block!important;
+        position: fixed!important;
+        z-index: 2000!important;
+        top: 15px!important;
+        left: 15px!important;
+        width: 14px!important;
+        height: 14px!important;
+        border: solid 2px transparent!important;
+        border-top-color: #fff!important;
+        border-left-color: #fff!important;
+        border-radius: 10px!important;
+        -webkit-animation: pace-spinner 400ms linear infinite!important;
+        -moz-animation: pace-spinner 400ms linear infinite!important;
+        -ms-animation: pace-spinner 400ms linear infinite!important;
+        -o-animation: pace-spinner 400ms linear infinite!important;
+        animation: pace-spinner 400ms linear infinite!important;
+      }
+
+      @-webkit-keyframes pace-spinner {
+        0% {
+          -webkit-transform: rotate(0deg);
+          transform: rotate(0deg);
+        }
+        100% {
+          -webkit-transform: rotate(360deg);
+          transform: rotate(360deg);
+        }
+      }
+      @-moz-keyframes pace-spinner {
+        0% {
+          -moz-transform: rotate(0deg);
+          transform: rotate(0deg);
+        }
+        100% {
+          -moz-transform: rotate(360deg);
+          transform: rotate(360deg);
+        }
+      }
+      @-o-keyframes pace-spinner {
+        0% {
+          -o-transform: rotate(0deg);
+          transform: rotate(0deg);
+        }
+        100% {
+          -o-transform: rotate(360deg);
+          transform: rotate(360deg);
+        }
+      }
+      @-ms-keyframes pace-spinner {
+        0% {
+          -ms-transform: rotate(0deg);
+          transform: rotate(0deg);
+        }
+        100% {
+          -ms-transform: rotate(360deg);
+          transform: rotate(360deg);
+        }
+      }
+      @keyframes pace-spinner {
+        0% {
+          transform: rotate(0deg);
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body class="skin-blue loading" ng-controller="eticca">
+    <div class="loader" id="initial-loader">Carregando...</div>
+    <div ng-view ng-cloak></div>
+    <!--[if lt IE 7]>
+      <p class="browsehappy">
+        You are using an <strong>outdated</strong> browser. Please
+        <a href="http://browsehappy.com/">upgrade your browser</a> to improve
+        your experience.
+      </p>
+    <![endif]-->
+  </body>
+</html>

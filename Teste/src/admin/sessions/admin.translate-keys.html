@@ -1,0 +1,110 @@
+<app-template app-ref="CTRA.appRef">
+  <div class="col-md-12" id="tableUsers">
+    <div class="box">
+      <div class="box-header">
+        <h3 class="box-title">Chaves de Tradução Cadastradas</h3>
+        <div class="box-tools">
+          <div class="input-group">
+            <input ng-model="CTRA.pagination.search" type="text" name="table_search" ng-change="CTRA.pesquisar(CTRA.pagination.search)"
+              class="form-control input-sm pull-right" style="width: 150px;" ng-model-options="{ debounce: 1000 }"
+              placeholder="Pesquisar">
+            <div class="input-group-btn">
+              <button class="btn btn-sm btn-default">
+                <i class="fa fa-search"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="box-body table-responsive no-padding">
+        <table class="table table-hover">
+          <thead>
+            <tr class="orderby">
+              <th>Chave <i class="fa" ng-show="CTRA.pagination.order.predicate=='nome'"
+                  ng-class="{'fa-sort-desc': CTRA.pagination.order.reverse, 'fa-sort-up': !CTRA.pagination.order.reverse}"></i></th>
+              <th>Descrição <i class="fa" ng-show="CTRA.pagination.order.predicate=='nome'"
+                  ng-class="{'fa-sort-desc': CTRA.pagination.order.reverse, 'fa-sort-up': !CTRA.pagination.order.reverse}"></i></th>
+              <th>Data Registro <i class="fa" ng-show="CTRA.pagination.order.predicate=='email'"
+                  ng-class="{'fa-sort-desc': CTRA.pagination.order.reverse, 'fa-sort-up': !CTRA.pagination.order.reverse}"></i></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="linkable"
+              ng-repeat="chavesTraducao in CTRA.filteredChaves = (CTRA.pagination.list | filter : CTRA.pagination.search | orderBy : ['status', '-insertedAt'])"
+              ng-click="CTRA.modalForm.open('edit', 'Editar Chave de Tradução', 'Salvar', chavesTraducao, $event)">
+              <td ng-bind="chavesTraducao.key"></td>
+              <td ng-bind="chavesTraducao.value||((chavesTraducao.value | limitTo:60)+'...')"></td>
+              <td ng-bind="chavesTraducao.insertedAt | date : 'dd/MM/yyyy \'às\' HH\'h\'mm\'m\' '"></td>
+              <td>
+                <button ng-hide="{{!chavesTraducao.remove}}" class="btn btn-danger btn-sm"
+                  id="{{'del_'+chavesTraducao.id}}"
+                  ng-bootbox-confirm="Tem certeza que deseja deletar a chave de tradução selecionada?"
+                  ng-bootbox-confirm-action="CTRA.modalForm.delete(chavesTraducao)">
+                  <i class="fa fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="col-md-12">
+          <h3 class="help-block" ng-hide="CTRA.filteredChaves.length">Nenhum resultado encontrado!</h3>
+        </div>
+        <div class="box-footer clearfix">
+          <ul class="pagination pagination-sm no-margin pull-right">
+            <li ng-click="CTRA.pagination.prev()" ng-class="{'disabled': CTRA.pagination.page===0}"><a href="#">«</a>
+            </li>
+            <li ng-repeat="page in CTRA.pagination.range" ng-class="{'disabled': CTRA.pagination.page===page}"
+              ng-click="CTRA.pagination.goTo(page)">
+              <a href="#" ng-bind="page+1"></a>
+            </li>
+            <li ng-click="CTRA.pagination.next()"
+              ng-class="{'disabled': CTRA.pagination.page===(CTRA.pagination.totalPages-1)}"><a href="#">»</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-12">
+    <button class="btn btn-primary btn-lg" ng-click="CTRA.modalForm.open('new', 'Nova Chave', 'Salvar', $event)"><i
+        class="fa fa-plus"></i> Novo </button>
+  </div>
+  <div class="modal fade" id="modalForm" tabindex="-1" role="dialog" aria-labelledby="modalForm">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+              aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" ng-bind="CTRA.modalForm.title"></h4>
+        </div>
+        <div class="modal-body">
+          <form role="form" ng-class="{'has-error': CTRA.modalForm.error}" name="userForm">
+            <div class="box-body">
+              <div class="form-group">
+                <label for="key">Chave</label>
+                <input type="text" class="form-control" id="key" name="key" ng-model="CTRA.modalForm.model.key"
+                  required>
+                <p class="text-danger" ng-if="CTRA.modalForm.validations.key" ng-bind="CTRA.modalForm.validations.key">
+                </p>
+              </div>
+              <div class="form-group">
+                <label for="value">Descrição</label>
+                <input type="text" class="form-control" id="value" name="value" ng-model="CTRA.modalForm.model.value"
+                  required>
+                <p class="text-danger" ng-if="CTRA.modalForm.validations.value"
+                  ng-bind="CTRA.modalForm.validations.value"></p>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-warning pull-left" ng-click="CTRA.modalForm.clearModalForm()"
+            ng-if="CTRA.modalForm.doing === 'new'">Limpar</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+          <button type="button" class="btn btn-success" ng-click="CTRA.modalForm.save()" ng-bind="CTRA.modalForm.button"
+            ng-disabled="userForm.$invalid"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-template>

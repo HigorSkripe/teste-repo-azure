@@ -1,0 +1,277 @@
+<app-template app-ref="EMPR.appRef">
+  <style>
+    .tableFixHead {
+      overflow-y: auto;
+      height: 250px;
+    }
+
+    .tableFixHead thead th {
+      position: sticky;
+      background-color: lightgray;
+      top: 0;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    th,
+    td {
+      padding: 8px 16px;
+      border: 1px solid #ccc;
+    }
+
+    th {
+      background: #eee;
+    }
+  </style>
+  <div class="col-xs-12">
+    <form>
+      <div class="table-responsive">
+        <div class="form-group">
+          <div class="form-group">
+            <label for="nomeEmpresa">Nome da Empresa</label>
+            <input type="text" class="form-control" id="nomeEmpresa" name="nomeEmpresa" placeholder="Nome Empresa"
+              ng-model="EMPR.empresa.nome" required>
+          </div>
+          <div class="form-group">
+            <label for="cnpj">CNPJ</label>
+            <input type="text" class="form-control" id="cnpj" name="cnpj" placeholder="CNPJ"
+              ng-model="EMPR.empresa.cnpj" ui-br-cnpj-mask>
+            <span class="help-block" ng-show="formQuiz.cnpj.$error.cnpj">CNPJ inválido!</span>
+          </div>
+          <div class="form-group">
+            <label for="email">Email Notificador de Denúncias</label>
+            <input type="email" class="form-control" id="email" name="email" placeholder="Email"
+              ng-model="EMPR.empresa.email" ng-pattern="">
+          </div>
+          <div class="form-group">
+            <label for="prazoDenuncia">Prazo de atendimento das denúncias (em dias)</label>
+            <input type="number" class="form-control" id="prazoDenuncia" name="prazoDenuncia"
+              placeholder="Prazo da Denuncia em dias" ng-model="EMPR.empresa.prazoDenuncia" ng-pattern="" required>
+          </div>
+          <div class="box-footer">
+            <button type="submit" class="btn btn-primary" id="btnConfirma" name="btnConfirma"
+              ng-click="EMPR.updateEmpresa()">Salvar</button>
+          </div>
+        </div>
+      </div>
+
+      <hr>
+
+      <!-- INITIAL FORM FILIAL -->
+      <div class="table-responsive">
+        <div class="form-group">
+          <div id="tableFiliais">
+            <div class="box">
+              <div class="box-header">
+                <h3 class="box-title">Filiais Cadastradas</h3>
+                <div class="box-tools">
+                  <div class="input-group">
+                    <input ng-model="EMPR.filial.search" type="text" name="filial_table_search"
+                      ng-change="EMPR.filial.pesquisar(EMPR.filial.search)" class="form-control input-sm pull-right"
+                      style="width: 150px;" ng-model-options="{ debounce: 1000 }" placeholder="Pesquisar Filial">
+                    <div class="input-group-btn">
+                      <button class="btn btn-sm btn-default">
+                        <i class="fa fa-search"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="box-body table-responsive no-padding tableFixHead">
+                <div class="col-xs-12" ng-show="EMPR.branchReference.branch">
+                  <div class="col-xs-12 col-sm-9 col-md-10 col-lg-10" style="margin: auto auto 20px -20px;">
+                    <a href="#" ng-click="EMPR.filial.modalForm.getRoot()"><i class="fa fa-chevron-left"></i> Voltar</a>
+                    / Filial Referência: <b>{{EMPR.branchReference.branch.nome}}</b>
+                  </div>
+                </div>
+                <table class="table table-hover">
+                  <thead>
+                    <tr class="orderby">
+                      <th ng-click="EMPR.filial.orderBy('branch_name')">Filial <i class="fa"
+                          ng-show="EMPR.filial.order.predicate=='branch_name'"
+                          ng-class="{'fa-sort-desc': EMPR.filial.order.reverse, 'fa-sort-up': !EMPR.filial.order.reverse}"></i>
+                      </th>
+                      <th ng-click="EMPR.filial.orderBy('branch_reference_name')">Filial Referência<i class="fa"
+                          ng-show="EMPR.filial.order.predicate=='branch_reference_name'"
+                          ng-class="{'fa-sort-desc': EMPR.filial.order.reverse, 'fa-sort-up': !EMPR.filial.order.reverse}"></i>
+                      </th>
+                      <th ng-click="EMPR.filial.orderBy('branch_type')">Tipo<i class="fa"
+                          ng-show="EMPR.filial.order.predicate=='branch_type'"
+                          ng-class="{'fa-sort-desc': EMPR.filial.order.reverse, 'fa-sort-up': !EMPR.filial.order.reverse}"></i>
+                      </th>
+                      <th ng-click="EMPR.filial.orderBy('created_at')">Data Registro<i class="fa"
+                          ng-show="EMPR.filial.order.predicate=='created_at'"
+                          ng-class="{'fa-sort-desc': EMPR.filial.order.reverse, 'fa-sort-up': !EMPR.filial.order.reverse}"></i>
+                      </th>
+                      <th style="text-align: center;">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="linkable" ng-repeat="filial in EMPR.filial.filiais">
+                      <td ng-bind="filial.nome" ng-click="EMPR.filial.modalForm.getSections(filial)"></td>
+                      <td ng-bind="filial.filialReferencia" ng-click="EMPR.filial.modalForm.getSections(filial)"></td>
+                      <td ng-bind="filial.tipo" ng-click="EMPR.filial.modalForm.getSections(filial)"></td>
+                      <td ng-bind="filial.insertedAt | date : 'dd/MM/yyyy \'às\' HH\'h\'mm\'m\' '"
+                        ng-click="EMPR.filial.modalForm.getSections(filial)"></td>
+                      <td style="text-align: center;">
+                        <button type="button" class="btn btn-sm btn-warning" title="Editar" id="{{'del_'+filial.id}}"
+                          ng-click="EMPR.filial.modalForm.open('edit', 'Editar Filial', 'Salvar', filial)">
+                          <i class="fa fa-pencil"></i>
+                        </button>
+                        <button type="button" class="btn btn-danger btn-sm" title="Remover" id="{{'del_'+filial.id}}"
+                          ng-bootbox-confirm="Tem certeza que deseja deletar a Filial '{{filial.nome}}'?"
+                          ng-bootbox-confirm-action="EMPR.filial.modalForm.delete(filial)">
+                          <i class="fa fa-trash"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="box-footer clearfix">
+                <ul class="pagination pagination-sm no-margin pull-right">
+                  <li ng-click="EMPR.filial.pagination.prev()" ng-class="{'disabled': EMPR.filial.pagination.page===0}">
+                    <a href="#">«</a>
+                  </li>
+                  <li ng-repeat="page in EMPR.filial.pagination.range"
+                    ng-class="{'disabled': EMPR.filial.pagination.page===page}"
+                    ng-click="EMPR.filial.pagination.goTo(page)">
+                    <a href="#" ng-bind="page+1"></a>
+                  </li>
+                  <li ng-click="EMPR.filial.pagination.next()"
+                    ng-class="{'disabled': EMPR.filial.pagination.page===(EMPR.filial.pagination.totalPages-1)}"><a
+                      href="#">»</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div>
+            <button type="button" class="btn btn-primary"
+              ng-click="EMPR.filial.modalForm.open('new', 'Nova Filial', 'Salvar')"><i class="fa fa-plus"></i>
+              Nova Filial
+            </button>
+          </div>
+
+          <div class="modal fade" id="modalForm" tabindex="-1" role="dialog" aria-labelledby="modalForm">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                      aria-hidden="true">&times;</span></button>
+                  <h4 class="modal-title" ng-bind="EMPR.filial.modalForm.title"></h4>
+                </div>
+                <div class="modal-body">
+                  <form role="form" ng-class="{'has-error': EMPR.filial.modalForm.error}" name="userForm">
+                    <div class="box-body">
+                      <div class="form-group">
+                        <label for="filialNome">Nome</label>
+                        <input type="text" class="form-control" id="filialNome" name="filialNome"
+                          ng-model="EMPR.filial.modalForm.model.nome" required>
+                        <p class="text-danger" ng-if="EMPR.filial.modalForm.validations.nome"
+                          ng-bind="EMPR.filial.modalForm.validations.nome">
+                        </p>
+                      </div>
+                      <div class="form-group" ng-show="EMPR.branchReference.branch">
+                        <label for="filialReferenciaNome">Filial Referência</label>
+                        <input type="text" class="form-control" id="filialReferenciaNome" name="filialReferenciaNome"
+                          ng-model="EMPR.filial.modalForm.model.filialReferenciaNome" disabled>
+                      </div>
+                      <div class="form-group">
+                        <label for="filialTipo">Tipo:</label>
+                        <select class="form-control" id="filialTipo" ng-model="EMPR.filial.modalForm.model.tipo"
+                          ng-disabled="EMPR.branchReference.branch || EMPR.filial.modalForm.doing === 'edit'">
+                          <option value="GENERAL">GERAL</option>
+                          <option value="COMPLAINT">DENÚNCIA</option>
+                          <option value="USER">USUÁRIO</option>
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <input type="hidden" class="form-control" id="filialEmpresaId" name="filialEmpresaId"
+                          ng-model="EMPR.filial.modalForm.model.empresaId">
+                      </div>
+                      <div class="form-group">
+                        <input type="hidden" class="form-control" id="filialReferenciaId" name="filialReferenciaId"
+                          ng-model="EMPR.filial.modalForm.model.filialId">
+                      </div>
+                    </div>
+                  </form>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-warning pull-left"
+                    ng-click="EMPR.filial.modalForm.clearModalForm()"
+                    ng-if="EMPR.filial.modalForm.doing === 'new'">Limpar</button>
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+                  <button type="button" class="btn btn-success" ng-click="EMPR.filial.modalForm.save()"
+                    ng-bind="EMPR.filial.modalForm.button" ng-disabled="userForm.$invalid"></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- FINAL FORM FILIAL -->
+
+      <hr>
+
+      <div class="table-responsive">
+        <div class="form-group">
+          <div class="form-group">
+            <label for="logo">Enviar logo:</label>
+            <input type="file" id="logo" accept=".png" file-model="EMPR.logoFile">
+            <p class="help-block">Somente arquivos de imagem no formato PNG.</p>
+            <div class="progress" ng-show="EMPR.progress.visible">
+              <div id="progressLogo" class="progress-bar progress-bar-striped" role="progressbar"
+                ng-class="{'active': EMPR.progress.keep}">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="form-group">
+            <div class="radio">
+              <label>
+                <input class="radio-inline" type="radio" value="logo" name="optLogo" ng-model="EMPR.optLogo"> Cabeçalho
+                (220x50)
+              </label>
+            </div>
+            <div class="radio">
+              <label>
+                <input class="radio-inline" type="radio" value="logologin" name="optLogo" ng-model="EMPR.optLogo"> Login
+                (340x140)
+              </label>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <button class="btn btn-primary" ng-click="EMPR.sendLogo(EMPR.logoFile)" ng-disabled="EMPR.logoFile===null">
+            <i class="fa fa-upload"></i>
+            Enviar Logo
+          </button>
+        </div>
+      </div>
+
+      <hr>
+
+      <div class="table-responsive">
+        <div class="form-group">
+          <button class="btn btn-primary pull-left" ng-click="EMPR.sendEmail()">
+            <i class="fa fa-report"></i>Enviar Relatório
+          </button>
+          <div class="pull-left top-page-ui">
+            <a tooltips
+              tooltip-template="Envia para o e-mail notificador de denúncias a listagem de quem não concluiu 100% o programa."
+              tooltip-side="top" class="icon-link info" style="cursor:pointer">
+              <span class="fa-stack">
+                <i class="fa fa-question-circle fa-stack-1x"></i>
+              </span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</app-template>

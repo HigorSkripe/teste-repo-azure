@@ -1,0 +1,340 @@
+<app-template app-ref="MAPAS.appRef">
+  <div class="col-xs-12">
+    <div class="box">
+      <div class="box-header">
+        <div class="box-tools">
+          <div class="input-group">
+            <input ng-model="MAPAS.pagination.search" type="text" name="table_search" class="form-control input-sm pull-right"
+              style="width: 150px;" placeholder="Pesquisar" ng-change="MAPAS.pesquisar(MAPAS.pagination.search)"
+              ng-model-options="{ debounce: 600 }">
+            <div class="input-group-btn">
+              <button class="btn btn-sm btn-default" ng-click="MAPAS.pesquisar(MAPAS.pagination.search)"><i
+                  class="fa fa-search"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="box-body table-responsive no-padding" id="tabelaStakeholders">
+        <table class="table table-hover table-bordered">
+          <tbody class="text-bold">
+            <tr class="active">
+              <td rowspan="1" colspan="24">PARTES INTERESSADAS</td>
+              <td rowspan="1" colspan="16">RESPONSABILIDADES</td>
+              <td rowspan="1" colspan="17">ESTRATÉGIAS</td>
+              <td rowspan="1" colspan="1"></td>
+            </tr>
+            <tr class="active">
+              <td rowspan="1" colspan="10">NOME DA PARTE INTERESSADA</td>
+              <td rowspan="1" colspan="4">PAPEL</td>
+              <td rowspan="1" colspan="3">INFLUÊNCIA</td>
+              <td rowspan="1" colspan="3">INTERESSE</td>
+              <td rowspan="1" colspan="4">GRAU DE RISCO</td>
+              <td rowspan="1" colspan="4">DEFINIR</td>
+              <td rowspan="1" colspan="4">PLANEJAR</td>
+              <td rowspan="1" colspan="4">EXECUTAR</td>
+              <td rowspan="1" colspan="4">REVISAR</td>
+              <td rowspan="1" colspan="5">GRUPO</td>
+              <td rowspan="1" colspan="6">TIPO</td>
+              <td rowspan="1" colspan="6">AÇÃO</td>
+              <td rowspan="1" colspan="1"></td>
+            </tr>
+          </tbody>
+          <tbody>
+            <tr ng-repeat="data in MAPAS.pagination.list">
+              <td rowspan="1" colspan="10" ng-click="MAPAS.focus(data, 'name', true)">
+                <span ng-hide="data.isFocus_name">{{data.nome}}</span>
+                <input id="name_{{data.id}}" type="text" class="form-control" ng-model-options="{ debounce: 800 }"
+                  ng-model="data.nome" ng-show="data.isFocus_name" ng-change="MAPAS.update(data, 'name')"
+                  ng-blur="MAPAS.update(data, 'name')">
+              </td>
+              <td rowspan="1" colspan="4">
+                <select class="form-control" id="mps_papel" ng-model="data.papel" ng-change="MAPAS.update(data)">
+                  <option ng-repeat="option in MAPAS.papel.options" value="{{option.value}}">{{option.text}}</option>
+                </select>
+              </td>
+              <td rowspan="1" colspan="3">
+                <select class="form-control" id="mps_influencia" ng-model="data.influencia"
+                  ng-change="MAPAS.update(data)">
+                  <option value="alta">Alta</option>
+                  <option value="baixa">Baixa</option>
+                </select>
+              </td>
+              <td rowspan="1" colspan="3">
+                <select class="form-control" id="mps_interesse" ng-model="data.interesse"
+                  ng-change="MAPAS.update(data)">
+                  <option value="alto">Alto</option>
+                  <option value="baixo">Baixo</option>
+                </select>
+              </td>
+              <td rowspan="1" colspan="4">{{data.grauRisco}}</td>
+              <td rowspan="1" colspan="4">
+                <select class="form-control" id="mps_definir" ng-model="data.definir" ng-change="MAPAS.update(data)">
+                  <option value="responsavel">Responsável</option>
+                  <option value="aprovador">Aprovador</option>
+                </select>
+              </td>
+              <td rowspan="1" colspan="4">
+                <select class="form-control" id="mps_planejar" ng-model="data.planejar" ng-change="MAPAS.update(data)">
+                  <option value="responsavel">Responsável</option>
+                  <option value="aprovador">Aprovador</option>
+                </select>
+              </td>
+              <td rowspan="1" colspan="4">
+                <select class="form-control" id="mps_executar" ng-model="data.executar" ng-change="MAPAS.update(data)">
+                  <option value="auditoria">Auditoria</option>
+                  <option value="diligencia">Diligência</option>
+                  <option value="investigacao">Investigação</option>
+                </select>
+              </td>
+              <td rowspan="1" colspan="4">
+                <select class="form-control" id="mps_revisar" ng-model="data.revisar" ng-change="MAPAS.update(data)">
+                  <option value="contrato">Contrato</option>
+                  <option value="parceria">Parceria</option>
+                  <option value="relacionamento">Relacionamento</option>
+                </select>
+              </td>
+              <td rowspan="1" colspan="5">{{data.grupo}}</td>
+              <td rowspan="1" colspan="6">{{data.tipo}}</td>
+              <td rowspan="1" colspan="6">{{data.acao}}</td>
+              <td>
+                <button class="btn btn-icon btn-danger" ng-click="MAPAS.remove(data)" data-target="#modalRemoveSH"
+                  data-toggle="modal">
+                  <fa class="fa fa-trash"></fa>
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td rowspan="1" colspan="10">
+                <input placeholder="Novo" id="name_{{data.id}}" type="text" class="form-control"
+                  ng-model-options="{ debounce: 800 }" ng-model="MAPAS.novo.nome" ng-change="MAPAS.create()">
+              </td>
+              <td rowspan="1" colspan="4">
+                <select class="form-control" id="mps_papel" ng-model="MAPAS.novo.papel" ng-change="MAPAS.create()">
+                  <option ng-repeat="option in MAPAS.papel.options" value="{{option.value}}">{{option.text}}</option>
+                </select>
+              </td>
+              <td rowspan="1" colspan="3">
+                <select class="form-control" id="mps_influencia" ng-model="MAPAS.novo.influencia"
+                  ng-change="MAPAS.create()">
+                  <option value="alta">Alta</option>
+                  <option value="baixa">Baixa</option>
+                </select>
+              </td>
+              <td rowspan="1" colspan="3">
+                <select class="form-control" id="mps_interesse" ng-model="MAPAS.novo.interesse"
+                  ng-change="MAPAS.create()">
+                  <option value="alto">Alto</option>
+                  <option value="baixo">Baixo</option>
+                </select>
+              </td>
+              <td rowspan="1" colspan="4" class="text-center">-</td>
+              <td rowspan="1" colspan="4">
+                <select class="form-control" id="mps_definir" ng-model="MAPAS.novo.definir" ng-change="MAPAS.create()">
+                  <option value="responsavel">Responsável</option>
+                  <option value="aprovador">Aprovador</option>
+                </select>
+              </td>
+              <td rowspan="1" colspan="4">
+                <select class="form-control" id="mps_planejar" ng-model="MAPAS.novo.planejar"
+                  ng-change="MAPAS.create()">
+                  <option value="responsavel">Responsável</option>
+                  <option value="aprovador">Aprovador</option>
+                </select>
+              </td>
+              <td rowspan="1" colspan="4">
+                <select class="form-control" id="mps_executar" ng-model="MAPAS.novo.executar"
+                  ng-change="MAPAS.create()">
+                  <option value="auditoria">Auditoria</option>
+                  <option value="diligencia">Diligência</option>
+                  <option value="investigacao">Investigação</option>
+                </select>
+              </td>
+              <td rowspan="1" colspan="4">
+                <select class="form-control" id="mps_revisar" ng-model="MAPAS.novo.revisar" ng-change="MAPAS.create()">
+                  <option value="contrato">Contrato</option>
+                  <option value="parceria">Parceria</option>
+                  <option value="relacionamento">Relacionamento</option>
+                </select>
+              </td>
+              <td rowspan="1" colspan="5" class="text-center">-</td>
+              <td rowspan="1" colspan="6" class="text-center">-</td>
+              <td rowspan="1" colspan="6" class="text-center">-</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12" style="padding-bottom: 10px; padding-top: 10px;">
+          <p class="text-center text-danger" ng-hide="MAPAS.pagination.list.length">
+            Nenhum resultado encontrado!
+          </p>
+          <ul class="pagination pagination-sm no-margin pull-right">
+            <li ng-click="MAPAS.pagination.prev()" ng-class="{'disabled': MAPAS.pagination.page===0}"><a href="#">«</a>
+            </li>
+            <li ng-repeat="page in MAPAS.pagination.range" ng-class="{'disabled': MAPAS.pagination.page===page}"
+              ng-click="MAPAS.pagination.goTo(page)">
+              <a href="#" ng-bind="page+1"></a>
+            </li>
+            <li ng-click="MAPAS.pagination.next()"
+              ng-class="{'disabled': MAPAS.pagination.page===(MAPAS.pagination.totalPages-1)}"><a href="#">»</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <p></p>
+  </div>
+  <div class="col-lg-4 col-md-6 col-xs-12">
+    <div class="box">
+      <div class="box-header">
+        <h3 class="box-title">Estratégias de Grupo</h3>
+      </div>
+      <div class="box-body">
+        <div class="row">
+          <div class="col-xs-6">
+            <div class="small-box bordered text-center">
+              <div class="inner" style="min-height: 123px">
+                <h3>{{MAPAS.counts.monitorar | number:0}}</h3>
+                <p>MONITORAR</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-xs-6">
+            <div class="small-box bordered text-center">
+              <div class="inner" style="min-height: 123px">
+                <h3>{{MAPAS.counts.monitorarConstantemente | number:0}}</h3>
+                <p>MONITORAR CONSTANTEMENTE</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-6">
+            <div class="small-box bordered text-center">
+              <div class="inner" style="min-height: 123px">
+                <h3>{{MAPAS.counts.monitorarEventualmente | number:0}}</h3>
+                <p>MONITORAR EVENTUALMENTE</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-xs-6">
+            <div class="small-box bordered text-center">
+              <div class="inner" style="min-height: 123px">
+                <h3>{{MAPAS.counts.monitorarRegularmente | number:0}}</h3>
+                <p>MONITORAR REGULARMENTE</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4 col-md-6 col-xs-12">
+    <div class="box">
+      <div class="box-header">
+        <h3 class="box-title">Tipo De Relacionamento</h3>
+      </div>
+      <div class="box-body">
+        <div class="row">
+          <div class="col-xs-6">
+            <div class="small-box bordered text-center">
+              <div class="inner" style="min-height: 123px"
+                ng-class="{'text-default': true, 'text-warning': false, 'text-danger': fale}">
+                <h3>{{MAPAS.counts.medioRisco | number:0}}</h3>
+                <p>MÉDIO RISCO</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-xs-6">
+            <div class="small-box bordered text-center">
+              <div class="inner" style="min-height: 123px">
+                <h3>{{MAPAS.counts.altoRisco | number:0}}</h3>
+                <p>ALTO RISCO</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-6">
+            <div class="small-box bordered text-center">
+              <div class="inner" style="min-height: 123px">
+                <h3>{{MAPAS.counts.baixoRisco | number:0}}</h3>
+                <p>BAIXO RISCO</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-xs-6">
+            <div class="small-box bordered text-center">
+              <div class="inner" style="min-height: 123px">
+                <h3>{{MAPAS.counts.medioAltoRisco | number:0}}</h3>
+                <p>MÉDIO-ALTO RISCO</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4 col-md-6 col-xs-12">
+    <div class="box">
+      <div class="box-header">
+        <h3 class="box-title">Ação Sugerida</h3>
+      </div>
+      <div class="box-body">
+        <div class="row">
+          <div class="col-xs-6">
+            <div class="small-box bordered text-center">
+              <div class="inner" style="min-height: 123px">
+                <h3>{{MAPAS.counts.rodizioFuncao | number:0}}</h3>
+                <p>RODÍZIO DE FUNÇÃO</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-xs-6">
+            <div class="small-box bordered text-center">
+              <div class="inner" style="min-height: 123px">
+                <h3>{{MAPAS.counts.rodizioFornecedor | number:0}}</h3>
+                <p>RODÍZIO DE FORNECEDOR</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-xs-6">
+            <div class="small-box bordered text-center">
+              <div class="inner" style="min-height: 123px">
+                <h3>{{MAPAS.counts.acompanharRelacionamento | number:0}}</h3>
+                <p>ACOMPANHAR RELACIONAMENTO</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-xs-6">
+            <div class="small-box bordered text-center">
+              <div class="inner" style="min-height: 123px">
+                <h3>{{MAPAS.counts.auditarContratos | number:0}}</h3>
+                <p>AUDITAR CONTRATOS</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="modalRemoveSH" tabindex="-1" role="dialog" aria-labelledby="modalForm">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+              aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">Confirmação de exclusão</h4>
+        </div>
+        <div class="modal-body">
+          <p>Tem certeza que deseja excluir o registro "{{MAPAS.exclude ? MAPAS.exclude.nome : ''}}"?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" ng-click="MAPAS.confirmRemove(false)" data-dismiss="modal">
+            <i class="fa fa-close"></i> Não</button>
+          <button type="button" class="btn btn-danger" data-dismiss="modal" ng-click="MAPAS.confirmRemove(true)">
+            <i class="fa fa-check"></i> Sim </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-template>

@@ -1,0 +1,1331 @@
+<app-template app-ref="MAPAR.appRef">
+  <div class="col-xs-12">
+    <div class="box">
+      <div class="box-header">
+        <h3 class="box-title">Classificação de Riscos</h3>
+      </div>
+      <div class="box-body table-responsive no-padding">
+        <div class="col-sm-2 col-xs-12">
+          <br class="hidden-xs">
+          <h5>PROBABILIDADE</h5>
+        </div>
+        <div class="col-sm-10 col-xs-12">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>DESPREZÍVEL</th>
+                <th>BAIXO</th>
+                <th>MODERADO</th>
+                <th>ALTO</th>
+                <th>MUITO ALTO</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td ng-bind="MAPAR.probabilidade.desprezivel"></td>
+                <td ng-bind="MAPAR.probabilidade.baixo"></td>
+                <td ng-bind="MAPAR.probabilidade.moderado"></td>
+                <td ng-bind="MAPAR.probabilidade.alto"></td>
+                <td ng-bind="MAPAR.probabilidade.muito_alto"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <hr>
+        <div class="col-sm-2 col-xs-12">
+          <br class="hidden-xs">
+          <h5>IMPACTO</h5>
+        </div>
+        <div class="col-sm-10 col-xs-12">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th>DESPREZÍVEL</th>
+                <th>BAIXO</th>
+                <th>MODERADO</th>
+                <th>ALTO</th>
+                <th>MUITO ALTO</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td ng-bind="MAPAR.impacto.desprezivel"></td>
+                <td ng-bind="MAPAR.impacto.baixo"></td>
+                <td ng-bind="MAPAR.impacto.moderado"></td>
+                <td ng-bind="MAPAR.impacto.alto"></td>
+                <td ng-bind="MAPAR.impacto.muito_alto"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xs-12" id="probabilidades">
+    <div class="box">
+      <div class="box-header">
+        <h3 class="box-title">PROBABILIDADES</h3>
+        <div class="box-tools">
+          <div class="input-group">
+            <input ng-model="MAPAR.pagination.search" type="text" name="table_search"
+              class="form-control input-sm pull-right" style="width: 150px;" placeholder="Pesquisar"
+              ng-change="MAPAR.pesquisar(MAPAR.pagination.search)" ng-model-options="{ debounce: 600 }">
+            <div class="input-group-btn">
+              <button class="btn btn-sm btn-default" ng-click="MAPAR.pesquisar(MAPAR.pagination.search)"><i
+                  class="fa fa-search"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="box-body table-responsive no-padding">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>DESCRIÇÃO DO RISCO</th>
+              <th>TIPO</th>
+              <th>PROBABILIDADE</th>
+              <th>IMPACTO</th>
+              <th>AÇÃO</th>
+              <th>RECOMENDAÇÃO</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr ng-repeat="prob in MAPAR.pagination.list">
+              <td ng-click="MAPAR.focus(prob, 'descricao', true)">
+                <span ng-hide="prob.isFocus_descricao">{{prob.descricao}}</span>
+                <input id="descricao_{{prob.id}}" type="text" class="form-control" ng-model-options="{ debounce: 800 }"
+                  ng-model="prob.descricao" ng-show="prob.isFocus_descricao"
+                  ng-blur="MAPAR.update(prob, 'descricao')">
+              </td>
+              <td>
+                <select class="form-control" name="mapr_tipo" ng-model="prob.tipo" ng-change="MAPAR.update(prob, null)">
+                  <option value="ameaca">Ameaça</option>
+                  <option value="oportunidade">Oportunidade</option>
+                </select>
+              </td>
+              <td>
+                <select class="form-control" name="mapr_probabilidade" ng-model="prob.probabilidade"
+                  ng-change="MAPAR.update(prob, null)">
+                  <option value="moderado">Moderado</option>
+                  <option value="desprezivel">Desprezível</option>
+                  <option value="baixo">Baixo</option>
+                  <option value="alto">Alto</option>
+                  <option value="muito_alto">Muito Alto</option>
+                </select>
+              </td>
+              <td>
+                <select class="form-control" name="mapr_impacto" ng-model="prob.impacto"
+                  ng-change="MAPAR.update(prob, null)">
+                  <option value="moderado">Moderado</option>
+                  <option value="desprezivel">Desprezível</option>
+                  <option value="baixo">Baixo</option>
+                  <option value="alto">Alto</option>
+                  <option value="muito_alto">Muito Alto</option>
+                </select>
+              </td>
+              <td>
+                <select class="form-control" name="mapr_acao" ng-model="prob.acao" ng-change="MAPAR.update(prob, null)">
+                  <option value="eliminar">Eliminar</option>
+                  <option value="aceitar">Aceitar</option>
+                  <option value="mitigar">Mitigar</option>
+                  <option value="transferir">Transferir</option>
+                  <option value="explorar">Explorar</option>
+                </select>
+              </td>
+              <td>
+                {{ MAPAR.recomendacoes[prob.acao] }}
+              </td>
+              <td>
+                <button ng-click="MAPAR.remove(prob)" class="btn btn-icon btn-danger" data-target="#modalRemoveMR"
+                  data-toggle="modal">
+                  <fa class="fa fa-trash"></fa>
+                </button>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <input id="descricao_create" type="text" class="form-control" ng-model-options="{ debounce: 800 }"
+                  ng-model="MAPAR.novo.descricao" ng-change="MAPAR.create()">
+              </td>
+              <td>
+                <select class="form-control" name="mapr_tipo" ng-model="MAPAR.novo.tipo" ng-change="MAPAR.create()">
+                  <option value="ameaca">Ameaça</option>
+                  <option value="oportunidade">Oportunidade</option>
+                </select>
+              </td>
+              <td>
+                <select class="form-control" name="mapr_probabilidade" ng-model="MAPAR.novo.probabilidade"
+                  ng-change="MAPAR.create()">
+                  <option value="moderado">Moderado</option>
+                  <option value="desprezivel">Desprezível</option>
+                  <option value="baixo">Baixo</option>
+                  <option value="alto">Alto</option>
+                  <option value="muito_alto">Muito Alto</option>
+                </select>
+              </td>
+              <td>
+                <select class="form-control" name="mapr_impacto" ng-model="MAPAR.novo.impacto"
+                  ng-change="MAPAR.create()">
+                  <option value="moderado">Moderado</option>
+                  <option value="desprezivel">Desprezível</option>
+                  <option value="baixo">Baixo</option>
+                  <option value="alto">Alto</option>
+                  <option value="muito_alto">Muito Alto</option>
+                </select>
+              </td>
+              <td>
+                <select class="form-control" name="mapr_acao" ng-model="MAPAR.novo.acao" ng-change="MAPAR.create()">
+                  <option value="eliminar">Eliminar</option>
+                  <option value="aceitar">Aceitar</option>
+                  <option value="mitigar">Mitigar</option>
+                  <option value="transferir">Transferir</option>
+                  <option value="explorar">Explorar</option>
+                </select>
+              </td>
+              <td>
+              </td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="col-xs-12 col-md-12 col-sm-12 col-lg-12" style="padding-bottom: 10px">
+          <p class="text-center text-danger" ng-hide="MAPAR.pagination.list.length">
+            Nenhum resultado encontrado!
+          </p>
+          <ul class="pagination pagination-sm no-margin pull-right">
+            <li ng-click="MAPAR.pagination.prev()" ng-class="{'disabled': MAPAR.pagination.page===0}"><a href="#">«</a>
+            </li>
+            <li ng-repeat="page in MAPAR.pagination.range" ng-class="{'disabled': MAPAR.pagination.page===page}"
+              ng-click="MAPAR.pagination.goTo(page)">
+              <a href="#" ng-bind="page+1"></a>
+            </li>
+            <li ng-click="MAPAR.pagination.next()"
+              ng-class="{'disabled': MAPAR.pagination.page===(MAPAR.pagination.totalPages-1)}"><a href="#">»</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-8">
+    <div class="box">
+      <div class="box-body table-responsive no-padding">
+        <div class="col-xs-2 no-padding pull-left" style="border-top: 87px solid transparent">
+          <div class="col-xs-2 no-padding text-bold" style="font-size: 10px; padding-left: 6%!important">
+            <p>P</p>
+            <p>R</p>
+            <p>O</p>
+            <p>B</p>
+            <p>A</p>
+            <p>B</p>
+            <p>I</p>
+            <p>L</p>
+            <p>I</p>
+            <p>D</p>
+            <p>A</p>
+            <p>D</p>
+            <p>E</p>
+          </div>
+          <div class="col-xs-10 no-padding pull-right">
+            <table class="table table-bordered">
+              <tbody>
+                <tr style="height: 56px">
+                  <th class="text-center" style="vertical-align: middle" scope="row">0,90</th>
+                </tr>
+                <tr style="height: 56px">
+                  <th class="text-center" style="vertical-align: middle" scope="row">0,70</th>
+                </tr>
+                <tr style="height: 56px">
+                  <th class="text-center" style="vertical-align: middle" scope="row">0,50</th>
+                </tr>
+                <tr style="height: 56px">
+                  <th class="text-center" style="vertical-align: middle" scope="row">0,30</th>
+                </tr>
+                <tr style="height: 56px">
+                  <th class="text-center" style="vertical-align: middle" scope="row">0,10</th>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="col-xs-10 no-padding">
+          <table class="table table-bordered table-hover">
+            <thead>
+              <tr>
+                <th class="text-center text-bold text-white bg-red" rowspan="1" colspan="5" scope="col"
+                  style="font-size: 1.5em">
+                  Ameaças
+                </th>
+                <th class="text-center text-bold text-white bg-blue" rowspan="1" colspan="5" scope="col"
+                  style="font-size: 1.5em">
+                  Oportunidades
+                </th>
+              </tr>
+              <tr>
+                <th rowspan="1" colspan="1">-0,05</th>
+                <th rowspan="1" colspan="1">-0,10</th>
+                <th rowspan="1" colspan="1">-0,20</th>
+                <th rowspan="1" colspan="1">-0,40</th>
+                <th rowspan="1" colspan="1">-0,80</th>
+                <th rowspan="1" colspan="1">0,80</th>
+                <th rowspan="1" colspan="1">0,40</th>
+                <th rowspan="1" colspan="1">0,20</th>
+                <th rowspan="1" colspan="1">0,10</th>
+                <th rowspan="1" colspan="1">0,05</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #f4b083;font-size: 80%;vertical-align: middle;text-align: center;">
+                          -0,05</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #f7caac;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.ameacas[MAPAR.grafico1.ameacasX[0] * MAPAR.grafico1.y[0]] | number:0}}</b>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #bfbfbf;font-size: 80%;vertical-align: middle;text-align: center;">
+                          -0,09</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #d8d8d8;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.ameacas[MAPAR.grafico1.ameacasX[1] * MAPAR.grafico1.y[0]] | number:0}}</b>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%;color: #fff;">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #800000;font-size: 80%;vertical-align: middle;text-align: center;">
+                          -0,18</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #ff0000;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.ameacas[MAPAR.grafico1.ameacasX[2] * MAPAR.grafico1.y[0]] | number:0}}</b>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%;color: #fff;">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #800000;font-size: 80%;vertical-align: middle;text-align: center;">
+                          -0,36</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #ff0000;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.ameacas[MAPAR.grafico1.ameacasX[3] * MAPAR.grafico1.y[0]] | number:0}}</b>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%;color: #fff;">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #800000;font-size: 80%;vertical-align: middle;text-align: center;">
+                          -0,72</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #ff0000;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.ameacas[MAPAR.grafico1.ameacasX[4] * MAPAR.grafico1.y[0]] | number:0}}</b>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%;color: #fff;">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #385623;font-size: 80%;vertical-align: middle;text-align: center;">
+                          0,72</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #548135;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.oportunidades[MAPAR.grafico1.oportunidadesX[4] * MAPAR.grafico1.y[0]] |
+                            number:0}}</b></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%;color: #fff;">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #385623;font-size: 80%;vertical-align: middle;text-align: center;">
+                          0,36</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #548135;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.oportunidades[MAPAR.grafico1.oportunidadesX[3] * MAPAR.grafico1.y[0]] |
+                            number:0}}</b></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%;color: #fff;">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #385623;font-size: 80%;vertical-align: middle;text-align: center;">
+                          0,18</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #548135;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.oportunidades[MAPAR.grafico1.oportunidadesX[2] * MAPAR.grafico1.y[0]] |
+                            number:0}}</b></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #bfbfbf;font-size: 80%;vertical-align: middle;text-align: center;">
+                          0,09</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #d8d8d8;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.oportunidades[MAPAR.grafico1.oportunidadesX[1] * MAPAR.grafico1.y[0]] |
+                            number:0}}</b></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #8eaadb;font-size: 80%;vertical-align: middle;text-align: center;">
+                          0,05</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #b4c6e7;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.oportunidades[MAPAR.grafico1.oportunidadesX[0] * MAPAR.grafico1.y[0]] |
+                            number:0}}</b></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+              <tr>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #f4b083;font-size: 80%;vertical-align: middle;text-align: center;">
+                          -0,04</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #f7caac;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.ameacas[MAPAR.grafico1.ameacasX[0] * MAPAR.grafico1.y[1]] | number:0}}</b>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #bfbfbf;font-size: 80%;vertical-align: middle;text-align: center;">
+                          -0,07</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #d8d8d8;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.ameacas[MAPAR.grafico1.ameacasX[1] * MAPAR.grafico1.y[1]] | number:0}}</b>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #bfbfbf;font-size: 80%;vertical-align: middle;text-align: center;">
+                          -0,14</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #d8d8d8;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.ameacas[MAPAR.grafico1.ameacasX[2] * MAPAR.grafico1.y[1]] | number:0}}</b>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%;color: #fff;">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #800000;font-size: 80%;vertical-align: middle;text-align: center;">
+                          -0,28</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #ff0000;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.ameacas[MAPAR.grafico1.ameacasX[3] * MAPAR.grafico1.y[1]] | number:0}}</b>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%;color: #fff;">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #800000;font-size: 80%;vertical-align: middle;text-align: center;">
+                          -0,56</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #ff0000;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.ameacas[MAPAR.grafico1.ameacasX[4] * MAPAR.grafico1.y[1]] | number:0}}</b>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%;color: #fff;">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #385623;font-size: 80%;vertical-align: middle;text-align: center;">
+                          0,56</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #548135;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.oportunidades[MAPAR.grafico1.oportunidadesX[4] * MAPAR.grafico1.y[1]] |
+                            number:0}}</b></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%;color: #fff;">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #385623;font-size: 80%;vertical-align: middle;text-align: center;">
+                          0,28</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #548135;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.oportunidades[MAPAR.grafico1.oportunidadesX[3] * MAPAR.grafico1.y[1]] |
+                            number:0}}</b></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #bfbfbf;font-size: 80%;vertical-align: middle;text-align: center;">
+                          0,14</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #d8d8d8;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.oportunidades[MAPAR.grafico1.oportunidadesX[2] * MAPAR.grafico1.y[1]] |
+                            number:0}}</b></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #bfbfbf;font-size: 80%;vertical-align: middle;text-align: center;">
+                          0,07</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #d8d8d8;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.oportunidades[MAPAR.grafico1.oportunidadesX[1] * MAPAR.grafico1.y[1]] |
+                            number:0}}</b></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #8eaadb;font-size: 80%;vertical-align: middle;text-align: center;">
+                          0,04</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #b4c6e7;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.oportunidades[MAPAR.grafico1.oportunidadesX[0] * MAPAR.grafico1.y[1]] |
+                            number:0}}</b></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+              <tr>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #f4b083;font-size: 80%;vertical-align: middle;text-align: center;">
+                          -0,03</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #f7caac;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.ameacas[MAPAR.grafico1.ameacasX[0] * MAPAR.grafico1.y[2]] | number:0}}</b>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #f4b083;font-size: 80%;vertical-align: middle;text-align: center;">
+                          -0,05</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #f7caac;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.ameacas[MAPAR.grafico1.ameacasX[1] * MAPAR.grafico1.y[2]] | number:0}}</b>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #bfbfbf;font-size: 80%;vertical-align: middle;text-align: center;">
+                          -0,10</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #d8d8d8;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.ameacas[MAPAR.grafico1.ameacasX[2] * MAPAR.grafico1.y[2]] | number:0}}</b>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%;color: #fff;">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #800000;font-size: 80%;vertical-align: middle;text-align: center;">
+                          -0,20</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #ff0000;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.ameacas[MAPAR.grafico1.ameacasX[3] * MAPAR.grafico1.y[2]] | number:0}}</b>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%;color: #fff;">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #800000;font-size: 80%;vertical-align: middle;text-align: center;">
+                          -0,40</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #ff0000;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.ameacas[MAPAR.grafico1.ameacasX[4] * MAPAR.grafico1.y[2]] | number:0}}</b>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%;color: #fff;">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #385623;font-size: 80%;vertical-align: middle;text-align: center;">
+                          0,40</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #548135;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.oportunidades[MAPAR.grafico1.oportunidadesX[4] * MAPAR.grafico1.y[2]] |
+                            number:0}}</b></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%;color: #fff;">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #385623;font-size: 80%;vertical-align: middle;text-align: center;">
+                          0,20</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #548135;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.oportunidades[MAPAR.grafico1.oportunidadesX[3] * MAPAR.grafico1.y[2]] |
+                            number:0}}</b></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #bfbfbf;font-size: 80%;vertical-align: middle;text-align: center;">
+                          0,10</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #d8d8d8;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.oportunidades[MAPAR.grafico1.oportunidadesX[2] * MAPAR.grafico1.y[2]] |
+                            number:0}}</b></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #8eaadb;font-size: 80%;vertical-align: middle;text-align: center;">
+                          0,05</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #b4c6e7;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.oportunidades[MAPAR.grafico1.oportunidadesX[1] * MAPAR.grafico1.y[2]] |
+                            number:0}}</b></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #8eaadb;font-size: 80%;vertical-align: middle;text-align: center;">
+                          0,03</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #b4c6e7;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.oportunidades[MAPAR.grafico1.oportunidadesX[0] * MAPAR.grafico1.y[2]] |
+                            number:0}}</b></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+              <tr>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #f4b083;font-size: 80%;vertical-align: middle;text-align: center;">
+                          -0,02</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #f7caac;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.ameacas[MAPAR.grafico1.ameacasX[0] * MAPAR.grafico1.y[3]] | number:0}}</b>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #f4b083;font-size: 80%;vertical-align: middle;text-align: center;">
+                          -0,03</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #f7caac;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.ameacas[MAPAR.grafico1.ameacasX[1] * MAPAR.grafico1.y[3]] | number:0}}</b>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #bfbfbf;font-size: 80%;vertical-align: middle;text-align: center;">
+                          -0,06</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #d8d8d8;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.ameacas[MAPAR.grafico1.ameacasX[2] * MAPAR.grafico1.y[3]] | number:0}}</b>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #bfbfbf;font-size: 80%;vertical-align: middle;text-align: center;">
+                          -0,12</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #d8d8d8;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.ameacas[MAPAR.grafico1.ameacasX[3] * MAPAR.grafico1.y[3]] | number:0}}</b>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%;color: #fff;">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #800000;font-size: 80%;vertical-align: middle;text-align: center;">
+                          -0,24</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #ff0000;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.ameacas[MAPAR.grafico1.ameacasX[4] * MAPAR.grafico1.y[3]] | number:0}}</b>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%;color: #fff;">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #385623;font-size: 80%;vertical-align: middle;text-align: center;">
+                          0,24</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #548135;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.oportunidades[MAPAR.grafico1.oportunidadesX[4] * MAPAR.grafico1.y[3]] |
+                            number:0}}</b></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #bfbfbf;font-size: 80%;vertical-align: middle;text-align: center;">
+                          0,12</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #d8d8d8;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.oportunidades[MAPAR.grafico1.oportunidadesX[3] * MAPAR.grafico1.y[3]] |
+                            number:0}}</b></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #bfbfbf;font-size: 80%;vertical-align: middle;text-align: center;">
+                          0,06</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #d8d8d8;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.oportunidades[MAPAR.grafico1.oportunidadesX[2] * MAPAR.grafico1.y[3]] |
+                            number:0}}</b></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #8eaadb;font-size: 80%;vertical-align: middle;text-align: center;">
+                          0,03</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #b4c6e7;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.oportunidades[MAPAR.grafico1.oportunidadesX[1] * MAPAR.grafico1.y[3]] |
+                            number:0}}</b></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #8eaadb;font-size: 80%;vertical-align: middle;text-align: center;">
+                          0,02</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #b4c6e7;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.oportunidades[MAPAR.grafico1.oportunidadesX[0] * MAPAR.grafico1.y[3]] |
+                            number:0}}</b></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+              <tr>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #f4b083;font-size: 80%;vertical-align: middle;text-align: center;">
+                          -0,01</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #f7caac;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.ameacas[MAPAR.grafico1.ameacasX[0] * MAPAR.grafico1.y[4]] | number:0}}</b>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #f4b083;font-size: 80%;vertical-align: middle;text-align: center;">
+                          -0,01</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #f7caac;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.ameacas[MAPAR.grafico1.ameacasX[1] * MAPAR.grafico1.y[4]] | number:0}}</b>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #f4b083;font-size: 80%;vertical-align: middle;text-align: center;">
+                          -0,02</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #f7caac;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.ameacas[MAPAR.grafico1.ameacasX[2] * MAPAR.grafico1.y[4]] | number:0}}</b>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #f4b083;font-size: 80%;vertical-align: middle;text-align: center;">
+                          -0,04</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #f7caac;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.ameacas[MAPAR.grafico1.ameacasX[3] * MAPAR.grafico1.y[4]] | number:0}}</b>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #bfbfbf;font-size: 80%;vertical-align: middle;text-align: center;">
+                          -0,08</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #d8d8d8;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.ameacas[MAPAR.grafico1.ameacasX[4] * MAPAR.grafico1.y[4]] | number:0}}</b>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #bfbfbf;font-size: 80%;vertical-align: middle;text-align: center;">
+                          0,08</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #d8d8d8;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.oportunidades[MAPAR.grafico1.oportunidadesX[4] * MAPAR.grafico1.y[4]] |
+                            number:0}}</b></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #8eaadb;font-size: 80%;vertical-align: middle;text-align: center;">
+                          0,04</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #b4c6e7;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.oportunidades[MAPAR.grafico1.oportunidadesX[3] * MAPAR.grafico1.y[4]] |
+                            number:0}}</b></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #8eaadb;font-size: 80%;vertical-align: middle;text-align: center;">
+                          0,02</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #b4c6e7;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.oportunidades[MAPAR.grafico1.oportunidadesX[2] * MAPAR.grafico1.y[4]] |
+                            number:0}}</b></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #8eaadb;font-size: 80%;vertical-align: middle;text-align: center;">
+                          0,01</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #b4c6e7;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.oportunidades[MAPAR.grafico1.oportunidadesX[1] * MAPAR.grafico1.y[4]] |
+                            number:0}}</b></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+                <td class="no-padding">
+                  <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width:100%">
+                    <tbody>
+                      <tr style="height: 19px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #8eaadb;font-size: 80%;vertical-align: middle;text-align: center;">
+                          0,01</td>
+                      </tr>
+                      <tr style="height: 36px;">
+                        <td
+                          style="vertical-align: bottom;background-color: #b4c6e7;font-size: 150%;vertical-align: middle;text-align: center;">
+                          <b>{{MAPAR.grafico1.oportunidades[MAPAR.grafico1.oportunidadesX[0] * MAPAR.grafico1.y[4]] |
+                            number:0}}</b></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-xs-12 col-sm-12 col-md-12 col-lg-4">
+    <div class="box">
+      <div class="box-body table-responsive no-padding">
+        <table cellspacing="0" cellpadding="0" dir="ltr" style="font-size: 13px;width: 100%;">
+          <colgroup>
+            <col width="23">
+            <col width="23">
+            <col width="23">
+            <col width="23">
+            <col width="23">
+            <col width="23">
+            <col width="23">
+            <col width="23">
+            <col width="23">
+            <col width="23">
+          </colgroup>
+          <tbody>
+            <tr style="height: 36px;">
+              <td
+                style="vertical-align: bottom;background-color: #000000;font-size: 150%;color: #ffffff;vertical-align: middle;text-align: center;"
+                rowspan="1" colspan="10"><b>MAPA DE RISCO</b></td>
+            </tr>
+            <tr style="height: 36px;">
+              <td
+                style="vertical-align: bottom;background-color: #262626;color: #ffffff;vertical-align: middle;text-align: center;"
+                rowspan="1" colspan="5">AMEAÇAS</td>
+              <td
+                style="vertical-align: bottom;background-color: #262626;color: #ffffff;vertical-align: middle;text-align: center;"
+                rowspan="1" colspan="5">OPORTUNIDADES</td>
+            </tr>
+            <tr style="height: 19px;">
+              <td style="vertical-align: bottom;background-color: #f7caac;"></td>
+              <td style="vertical-align: bottom;background-color: #d8d8d8;"></td>
+              <td style="vertical-align: bottom;background-color: #ff0000;"></td>
+              <td
+                style="vertical-align: bottom;background-color: #ff0000;font-size: 150%;color: #ffffff;vertical-align: middle;text-align: center;"
+                rowspan="2" colspan="2">
+                <b></b>
+                <div>{{MAPAR.grafico2.ameacas.alto}}</div>
+              </td>
+              <td
+                style="vertical-align: bottom;background-color: #548135;font-size: 150%;color: #ffffff;vertical-align: middle;text-align: center;"
+                rowspan="2" colspan="2">
+                <b></b>
+                <div>{{MAPAR.grafico2.oportunidades.alto}}</div>
+              </td>
+              <td style="vertical-align: bottom;background-color: #548135;"></td>
+              <td style="vertical-align: bottom;background-color: #d8d8d8;"></td>
+              <td style="vertical-align: bottom;background-color: #b4c6e7;"></td>
+            </tr>
+            <tr style="height: 36px;">
+              <td style="vertical-align: bottom;background-color: #f7caac;"></td>
+              <td style="vertical-align: bottom;background-color: #d8d8d8;"></td>
+              <td style="vertical-align: bottom;background-color: #ff0000;"></td>
+              <td style="vertical-align: bottom;background-color: #548135;"></td>
+              <td style="vertical-align: bottom;background-color: #d8d8d8;"></td>
+              <td style="vertical-align: bottom;background-color: #b4c6e7;"></td>
+            </tr>
+            <tr style="height: 19px;">
+              <td style="vertical-align: bottom;background-color: #f7caac;"></td>
+              <td style="vertical-align: bottom;background-color: #d8d8d8;"></td>
+              <td style="vertical-align: bottom;background-color: #d8d8d8;"></td>
+              <td style="vertical-align: bottom;background-color: #ff0000;"></td>
+              <td style="vertical-align: bottom;background-color: #ff0000;"></td>
+              <td style="vertical-align: bottom;background-color: #548135;"></td>
+              <td style="vertical-align: bottom;background-color: #548135;"></td>
+              <td style="vertical-align: bottom;background-color: #d8d8d8;"></td>
+              <td style="vertical-align: bottom;background-color: #d8d8d8;"></td>
+              <td style="vertical-align: bottom;background-color: #b4c6e7;"></td>
+            </tr>
+            <tr style="height: 36px;">
+              <td style="vertical-align: bottom;background-color: #f7caac;"></td>
+              <td style="vertical-align: bottom;background-color: #d8d8d8;"></td>
+              <td style="vertical-align: bottom;background-color: #d8d8d8;"></td>
+              <td style="vertical-align: bottom;background-color: #ff0000;"></td>
+              <td style="vertical-align: bottom;background-color: #ff0000;"></td>
+              <td style="vertical-align: bottom;background-color: #548135;"></td>
+              <td style="vertical-align: bottom;background-color: #548135;"></td>
+              <td style="vertical-align: bottom;background-color: #d8d8d8;"></td>
+              <td style="vertical-align: bottom;background-color: #d8d8d8;"></td>
+              <td style="vertical-align: bottom;background-color: #b4c6e7;"></td>
+            </tr>
+            <tr style="height: 19px;">
+              <td style="vertical-align: bottom;background-color: #f7caac;"></td>
+              <td style="vertical-align: bottom;background-color: #f7caac;"></td>
+              <td style="vertical-align: bottom;background-color: #d8d8d8;"></td>
+              <td style="vertical-align: bottom;background-color: #ff0000;"></td>
+              <td style="vertical-align: bottom;background-color: #ff0000;"></td>
+              <td style="vertical-align: bottom;background-color: #548135;"></td>
+              <td style="vertical-align: bottom;background-color: #548135;"></td>
+              <td style="vertical-align: bottom;background-color: #d8d8d8;"></td>
+              <td style="vertical-align: bottom;background-color: #b4c6e7;"></td>
+              <td style="vertical-align: bottom;background-color: #b4c6e7;"></td>
+            </tr>
+            <tr style="height: 36px;">
+              <td style="vertical-align: bottom;background-color: #f7caac;"></td>
+              <td style="vertical-align: bottom;background-color: #f7caac;"></td>
+              <td style="vertical-align: bottom;background-color: #d8d8d8;"></td>
+              <td style="vertical-align: bottom;background-color: #ff0000;"></td>
+              <td style="vertical-align: bottom;background-color: #ff0000;"></td>
+              <td style="vertical-align: bottom;background-color: #548135;"></td>
+              <td style="vertical-align: bottom;background-color: #548135;"></td>
+              <td style="vertical-align: bottom;background-color: #d8d8d8;"></td>
+              <td style="vertical-align: bottom;background-color: #b4c6e7;"></td>
+              <td style="vertical-align: bottom;background-color: #b4c6e7;"></td>
+            </tr>
+            <tr style="height: 19px;">
+              <td style="vertical-align: bottom;background-color: #f7caac;"></td>
+              <td style="vertical-align: bottom;background-color: #f7caac;"></td>
+              <td
+                style="vertical-align: bottom;background-color: #d8d8d8;font-size: 150%;color: #000000;vertical-align: middle;text-align: center;"
+                rowspan="2" colspan="2">
+                <b></b>
+                <div>{{MAPAR.grafico2.ameacas.moderado}}</div>
+              </td>
+              <td style="vertical-align: bottom;background-color: #ff0000;"></td>
+              <td style="vertical-align: bottom;background-color: #548135;"></td>
+              <td
+                style="vertical-align: bottom;background-color: #d8d8d8;font-size: 150%;color: #000000;vertical-align: middle;text-align: center;"
+                rowspan="2" colspan="2">
+                <b></b>
+                <div>{{MAPAR.grafico2.oportunidades.moderado}}</div>
+              </td>
+              <td style="vertical-align: bottom;background-color: #b4c6e7;"></td>
+              <td style="vertical-align: bottom;background-color: #b4c6e7;"></td>
+            </tr>
+            <tr style="height: 36px;">
+              <td style="vertical-align: bottom;background-color: #f7caac;"></td>
+              <td style="vertical-align: bottom;background-color: #f7caac;"></td>
+              <td style="vertical-align: bottom;background-color: #ff0000;"></td>
+              <td style="vertical-align: bottom;background-color: #548135;"></td>
+              <td style="vertical-align: bottom;background-color: #b4c6e7;"></td>
+              <td style="vertical-align: bottom;background-color: #b4c6e7;"></td>
+            </tr>
+            <tr style="height: 19px;">
+              <td
+                style="vertical-align: bottom;background-color: #f7caac;font-size: 150%;vertical-align: middle;text-align: center;"
+                rowspan="2" colspan="2">
+                <b></b>
+                <div>{{MAPAR.grafico2.ameacas.baixo}}</div>
+              </td>
+              <td style="vertical-align: bottom;background-color: #f7caac;"></td>
+              <td style="vertical-align: bottom;background-color: #f7caac;"></td>
+              <td style="vertical-align: bottom;background-color: #d8d8d8;"></td>
+              <td style="vertical-align: bottom;background-color: #d8d8d8;"></td>
+              <td style="vertical-align: bottom;background-color: #b4c6e7;"></td>
+              <td style="vertical-align: bottom;background-color: #b4c6e7;"></td>
+              <td
+                style="vertical-align: bottom;background-color: #b4c6e7;font-size: 150%;vertical-align: middle;text-align: center;"
+                rowspan="2" colspan="2">
+                <b></b>
+                <div>{{MAPAR.grafico2.oportunidades.baixo}}</div>
+              </td>
+            </tr>
+            <tr style="height: 36px;">
+              <td style="vertical-align: bottom;background-color: #f7caac;"></td>
+              <td style="vertical-align: bottom;background-color: #f7caac;"></td>
+              <td style="vertical-align: bottom;background-color: #d8d8d8;"></td>
+              <td style="vertical-align: bottom;background-color: #d8d8d8;"></td>
+              <td style="vertical-align: bottom;background-color: #b4c6e7;"></td>
+              <td style="vertical-align: bottom;background-color: #b4c6e7;"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="modalRemoveMR" tabindex="-1" role="dialog" aria-labelledby="modalForm">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+              aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">Confirmação de exclusão</h4>
+        </div>
+        <div class="modal-body">
+          <p>Tem certeza que deseja excluir o registro "{{MAPAR.exclude ? MAPAR.exclude.descricao : ''}}"?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" ng-click="MAPAR.confirmRemove(false)" data-dismiss="modal">
+            <i class="fa fa-close"></i> Não</button>
+          <button type="button" class="btn btn-danger" data-dismiss="modal" ng-click="MAPAR.confirmRemove(true)">
+            <i class="fa fa-check"></i> Sim </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-template>

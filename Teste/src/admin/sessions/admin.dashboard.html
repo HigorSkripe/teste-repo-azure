@@ -1,0 +1,230 @@
+<app-template app-ref="DASH.appRef">
+  <div class="text-justify" id="dashboard2">
+    <div class="row">
+      <div class="form-group col-lg-4 col-md-4 col-sm-12 col-xs-12">
+        <label for="DASH.dropGrupos">Grupo de Usuários</label>
+        <select name="dropGrupos" id="DASH.dropGrupos" name="DASH.dropGrupos" ng-change="DASH.update()"
+          class="form-control" ng-model="DASH.selectedGroup" required>
+          <option ng-repeat="item in DASH.dropGrupos" value="{{item.nome}}">{{item.nome}}</option>
+        </select>
+      </div>
+      <div class="form-group col-lg-4 col-md-4 col-sm-12 col-xs-12" ng-hide="!DASH.secaoHabilitada">
+        <label for="DASH.dropBranches">Filial</label>
+        <select name="dropBranches" id="dropBranches" name="dropBranches" ng-change="DASH.refreshDashboard()"
+          class="form-control" ng-model="DASH.selectedBranch">
+          <option ng-repeat="branch in DASH.dropBranches" ng-value="branch">{{branch.nome}}</option>
+        </select>
+      </div>
+      <div class="form-group col-lg-4 col-md-4 col-sm-12 col-xs-12">
+        <label for="versoes">Versão </label>
+        <select id="versoes" class="form-control" ng-model="DASH.selectedProgram" ng-change="DASH.refreshDashboard()">
+          <option ng-repeat="prog in DASH.dropProgramas" ng-value="prog.nome">
+            {{prog.nome}}
+          </option>
+        </select>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <div class="col-md-5 col-sm-12">
+          <h3 class="pull-left">Risco</h3>
+          <c3chart bindto-id="chart-risco" chart-data="DASH.riscoTotal.datapoints"
+            chart-columns="DASH.riscoTotal.datacolumns">
+            <chart-colors color-function="DASH.calculaCor" />
+            <chart-gauge min="0" max="100" units=" Percentual de Risco" width="40">
+            </chart-gauge>
+          </c3chart>
+        </div>
+        <div class="col-md-7 col-sm-12" ng-style="DASH.mobileStyle">
+          <h3 class="pull-left">Indicadores de Risco </h3>
+          <div class="pull-left top-page-ui">
+            <div class="form-group">
+              <a tooltips tooltip-template="Nível de risco baseado na média dos resultados." tooltip-side="bottom"
+                class="icon-link info" style="cursor:pointer">
+                <span class="fa-stack">
+                  <i class="fa fa-question-circle fa-stack-1x"></i>
+                </span>
+              </a>
+            </div>
+          </div>
+
+          <table class="table table-condensed">
+            <tr>
+              <th style="width: 10px"></th>
+              <th>Índices</th>
+              <th>Gravidade</th>
+              <th style="width: 40px">%</th>
+            </tr>
+            <tr>
+              <td>1.</td>
+              <td>Colaboradores Não Cadastrados</td>
+              <td>
+                <div class="progress progress-xs">
+                  <div class="progress-bar"
+                    ng-class="{'progress-bar-success': DASH.colaborador.riscoColaboradoresAtivos < 33.4, 'progress-bar-yellow': DASH.colaborador.riscoColaboradoresAtivos >= 33.4 && DASH.colaborador.riscoColaboradoresAtivos < 66.6, 'progress-bar-danger': DASH.colaborador.riscoColaboradoresAtivos >= 66.6}"
+                    style="width: {{DASH.colaborador.riscoColaboradoresAtivos}}%"></div>
+                </div>
+              </td>
+              <td>
+                <span class="badge"
+                  ng-class="{'bg-green': DASH.colaborador.riscoColaboradoresAtivos < 33.4, 'bg-yellow': DASH.colaborador.riscoColaboradoresAtivos >= 33.4 && DASH.colaborador.riscoColaboradoresAtivos < 66.6, 'bg-red': DASH.colaborador.riscoColaboradoresAtivos >= 66.6}">{{DASH.colaborador.riscoColaboradoresAtivos
+                  | number : 1 }}%</span>
+              </td>
+            </tr>
+            <tr>
+              <td>2.</td>
+              <td>Conclusão do Programa</td>
+              <td>
+                <div class="progress progress-xs">
+                  <div class="progress-bar"
+                    ng-class="{'progress-bar-success': DASH.colaborador.riscoConclusaoPrograma < 33.4, 'progress-bar-yellow': DASH.colaborador.riscoConclusaoPrograma >= 33.4 && DASH.colaborador.riscoConclusaoPrograma < 66.7, 'progress-bar-danger': DASH.colaborador.riscoConclusaoPrograma >= 66.6}"
+                    style="width: {{DASH.colaborador.riscoConclusaoPrograma}}%"></div>
+                </div>
+              </td>
+              <td>
+                <span class="badge"
+                  ng-class="{'bg-green': DASH.colaborador.riscoConclusaoPrograma < 33.4, 'bg-yellow': DASH.colaborador.riscoConclusaoPrograma >= 33.4 && DASH.colaborador.riscoConclusaoPrograma < 66.6, 'bg-red': DASH.colaborador.riscoConclusaoPrograma >= 66.6}">{{DASH.colaborador.riscoConclusaoPrograma
+                  | number : 1 }}%</span>
+              </td>
+            </tr>
+            <tr>
+              <td>3.</td>
+              <td>{{DASH.keyDenuncias}} não tratadas</td>
+              <td>
+                <div class="progress progress-xs">
+                  <div class="progress-bar "
+                    ng-class="{'progress-bar-success': DASH.denuncias.riscoDenunciaNaoTradada < 33.4, 'progress-bar-yellow': DASH.denuncias.riscoDenunciaNaoTradada >= 33.4 && DASH.denuncias.riscoDenunciaNaoTradada < 66.7, 'progress-bar-danger': DASH.denuncias.riscoDenunciaNaoTradada >= 66.6}"
+                    style="width: {{DASH.denuncias.riscoDenunciaNaoTradada}}%"></div>
+                </div>
+              </td>
+              <td>
+                <span class="badge"
+                  ng-class="{'bg-green': DASH.denuncias.riscoDenunciaNaoTradada < 33.4, 'bg-yellow': DASH.denuncias.riscoDenunciaNaoTradada >= 33.4 && DASH.denuncias.riscoDenunciaNaoTradada < 66.6, 'bg-red': DASH.denuncias.riscoDenunciaNaoTradada >= 66.6}">{{DASH.denuncias.riscoDenunciaNaoTradada
+                  | number:1}}%</span>
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="col-md-12">
+          <hr>
+        </div>
+        <div class="col-md-3 col-sm-12">
+          <h3 class="pull-left">{{DASH.keyDenuncias}}</h3>
+          <div class="pull-left top-page-ui">
+            <div class="form-group">
+              <a tooltips tooltip-template="Exibe a quantidade de {{DASH.keyDenuncias}} abertas, em análise e fechadas."
+                tooltip-side="bottom" class="icon-link info" style="cursor:pointer">
+                <span class="fa-stack">
+                  <i class="fa fa-question-circle fa-stack-1x"></i>
+                </span>
+              </a>
+            </div>
+          </div>
+          <div class="col-lg-12" ng-style="DASH.mobileStyle">
+            <!-- small box -->
+            <div class="small-box bg-green">
+              <div class="inner">
+                <h3>{{DASH.denuncias.fechado}}</h3>
+                <p>{{denuncias}} Fechadas</p>
+              </div>
+              <div class="icon">
+                <i class="fa fa-thumbs-up icon-smallbox"></i>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-12">
+            <!-- small box -->
+            <div class="small-box bg-red">
+              <div class="inner">
+                <h3>{{DASH.denuncias.aberto}}</h3>
+                <p>{{DASH.keyDenuncias}} Abertas</p>
+              </div>
+              <div class="icon">
+                <i class="fa fa-exclamation-circle icon-smallbox"></i>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-12">
+            <!-- small box -->
+            <div class="small-box bg-yellow">
+              <div class="inner">
+                <h3>{{DASH.denuncias.em_progresso}}</h3>
+                <p>{{DASH.keyDenuncia}} em Análise</p>
+              </div>
+              <div class="icon">
+                <i class="fa fa-eye icon-smallbox"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-9 col-sm-12">
+          <h3>Colaboradores</h3>
+          <div class="col-md-8">
+            <c3chart bindto-id="pie-plot1-chart2" chart-data="DASH.colaboradoresAtivos.datapoints"
+              chart-columns="DASH.colaboradoresAtivos.datacolumns">
+              <chart-pie expand="true" />
+            </c3chart>
+          </div>
+          <div class="col-md-4">
+            <div class="callout callout-info">
+              <h4 style="font-size: 2em">{{DASH.colaborador.preCadastrados}}</h4>
+              <p style="font-size: 1.3em">Aguardando Cadastro</p>
+            </div>
+            <div class="callout callout-warning">
+              <h4 style="font-size: 2em">{{DASH.colaborador.naoAtivo}}</h4>
+              <p style="font-size: 1.3em">Inativo(s)</p>
+            </div>
+            <div class="callout callout-success">
+              <h4 style="font-size: 2em">{{DASH.colaborador.ativo}}</h4>
+              <p style="font-size: 1.3em">Ativo(s)</p>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+    <div class="col-md-12">
+      <hr>
+    </div>
+    <div class="col-md-12">
+      <h3 class="pull-left">
+        Resultados do Programa
+      </h3>
+      <div class="pull-left top-page-ui">
+        <div class="form-group">
+          <a tooltips
+            tooltip-template="Mostra porcentagem de colaboradores que completaram ou não todo o programa. - Acima nota média de todo programa. - Donut mostra a porcentagem de colabores por faixa de nota."
+            tooltip-side="right" class="icon-link info" style="cursor:pointer">
+            <span class="fa-stack">
+              <i class="fa fa-question-circle fa-stack-1x"></i>
+            </span>
+          </a>
+        </div>
+      </div>
+      <br>
+      <div class="col-lg-12 text-center">
+        <span class="badge" style="font-size: 2em">{{DASH.colaborador.mediaNotas/10 | number: 2}}</span>
+        <h4>
+          Média das Notas
+        </h4>
+      </div>
+      <div class="col-md-6 col-sm-12">
+        <c3chart bindto-id="pie-plot1-chart5" chart-data="DASH.resultadoProgramas.datapoints"
+          chart-columns="DASH.resultadoProgramas.datacolumns">
+          <chart-colors color-pattern="#5D7280,#EA4B3C,#4F3C38,#2A6389,#62C5EC" />
+          <chart-pie expand="true" />
+        </c3chart>
+      </div>
+      <div class="col-md-6 col-sm-12">
+        <c3chart bindto-id="donut-plot1-chart" chart-data="DASH.notasPrograma.datapoints"
+          chart-columns="DASH.notasPrograma.datacolumns">
+          <chart-colors color-pattern="#EA4B3C,#2A6389,#4F3C38,#5D7280,#62C5EC" />
+        </c3chart>
+      </div>
+    </div>
+  </div>
+  <div class="text-center" ng-show="false">
+    <span class="loading__anim"></span>
+  </div>
+</app-template>

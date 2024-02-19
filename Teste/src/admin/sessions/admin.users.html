@@ -1,0 +1,585 @@
+<app-template app-ref="USUA.appRef">
+  <style>
+    .tableFixHead {
+      overflow-y: auto;
+      height: 430px;
+    }
+
+    .tableFixHead thead th {
+      position: sticky;
+      background-color: lightgray;
+      top: 0;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    th,
+    td {
+      padding: 8px 16px;
+      border: 1px solid #ccc;
+    }
+
+    th {
+      background: #eee;
+    }
+  </style>
+  <div class="col-md-12" id="tableUsers">
+    <div class="row">
+      <div class="form-group col-lg-6 col-md-6 col-sm-12 col-xs-12">
+        <label for="USUA.dropGrupos">Grupo de Usuários</label>
+        <select name="dropGrupos" id="USUA.dropGrupos" name="USUA.dropGrupos" ng-change="USUA.update()"
+          class="form-control" ng-model="USUA.selectedGrupo" required>
+          <option ng-repeat="item in USUA.dropGrupos" value="{{item.nome}}">{{item.nome}}</option>
+        </select>
+      </div>
+      <div class="form-group col-lg-6 col-md-6 col-sm-12 col-xs-12">
+        <label for="versoes">Versão: </label>
+        <select id="versoes" class="form-control" ng-model="USUA.listaUsuariosModel"
+          ng-change="USUA.updateUsersListActive()">
+          <option ng-repeat="prog in USUA.programasListaUsuario" ng-value="prog">
+            {{prog.nome}}
+          </option>
+        </select>
+      </div>
+    </div>
+    <div class="box">
+      <div class="box-header">
+        <h3 class="box-title">Colaboradores</h3>
+        <div class="box-tools">
+          <div class="input-group">
+            <input ng-model="USUA.pagination.search" type="text" name="table_search"
+              ng-change="USUA.pesquisar(USUA.pagination.search)" class="form-control input-sm pull-right"
+              style="width: 150px;" ng-model-options="{ debounce: 1000 }" placeholder="Pesquisar">
+            <div class="input-group-btn">
+              <button class="btn btn-sm btn-default">
+                <i class="fa fa-search"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="box-header">
+        <div class="form-group col-lg-2 col-md-2 col-sm-4 col-xs-4">
+          <label for="filialUsers">Filial: </label>
+          <select id="filialUsers" class="form-control" ng-model="USUA.filialSelected"
+            ng-change="USUA.updateFilialList()">
+            <option ng-repeat="filial in USUA.filiaisSearch" ng-value="filial">
+              {{filial.nome}}
+            </option>
+          </select>
+        </div>
+        <div class="form-group col-lg-2 col-md-2 col-sm-4 col-xs-4">
+          <label for="activeUsers">Usuários: </label>
+          <select id="activeUsers" class="form-control" ng-model="USUA.usersListActiveModel"
+            ng-change="USUA.updateUsersListActive()">
+            <option ng-repeat="userActive in USUA.usersListActive" ng-value="userActive">
+              {{userActive.name}}
+            </option>
+          </select>
+        </div>
+        <div class="form-group col-lg-2 col-md-2 col-sm-4 col-xs-4">
+          <label for="progressUsers">Progresso: </label>
+          <select id="progressUsers" class="form-control" ng-model="USUA.usersListProgressModel"
+            ng-change="USUA.updateUsersListProgress()">
+            <option ng-repeat="userProgress in USUA.usersListProgress" ng-value="userProgress">
+              {{userProgress.name}}
+            </option>
+          </select>
+        </div>
+      </div>
+      <div class="box-body table-responsive no-padding tableFixHead">
+        <table class="table table-hover">
+          <thead>
+            <tr class="orderby">
+              <th ng-click="USUA.orderBy('userprogress_user_name')">Nome
+                <i class="fa" ng-show="USUA.pagination.orderBy.key==='userprogress_user_name'"
+                  ng-class="{'fa-sort-desc': USUA.pagination.orderBy.order === 'desc', 'fa-sort-up': !USUA.pagination.orderBy.order === 'asc'}"></i>
+              </th>
+              <th ng-click="USUA.orderBy('userprogress_branch_name')">Filial
+                <i class="fa" ng-show="USUA.pagination.orderBy.key==='userprogress_branch_name'"
+                  ng-class="{'fa-sort-desc': USUA.pagination.orderBy.order === 'desc', 'fa-sort-up': !USUA.pagination.orderBy.order === 'asc'}"></i>
+              </th>
+              <th ng-hide="!USUA.secaoHabilitada" ng-click="USUA.orderBy('userprogress_section_name')">{{USUA.secaoChaveNome}}
+                <i class="fa" ng-show="USUA.pagination.orderBy.key==='userprogress_section_name'"
+                  ng-class="{'fa-sort-desc': USUA.pagination.orderBy.order === 'desc', 'fa-sort-up': !USUA.pagination.orderBy.order === 'asc'}"></i>
+              </th>
+              <th ng-click="USUA.orderBy('userprogress_user_email')">Email
+                <i class="fa" ng-show="USUA.pagination.orderBy.key==='userprogress_user_email'"
+                  ng-class="{'fa-sort-desc': USUA.pagination.orderBy.order === 'desc', 'fa-sort-up': !USUA.pagination.orderBy.order === 'asc'}"></i>
+              </th>
+              <th ng-click="USUA.orderBy('created_at')">Data de Inserção
+                <i class="fa" ng-show="USUA.pagination.orderBy.key==='created_at'"
+                  ng-class="{'fa-sort-desc': USUA.pagination.orderBy.order === 'desc', 'fa-sort-up': !USUA.pagination.orderBy.order === 'asc'}"></i>
+              </th>
+              <th ng-click="USUA.orderBy('userprogress_attemps')">Tentativas de Prova
+                <i class="fa" ng-show="USUA.pagination.orderBy.key==='userprogress_attemps'"
+                  ng-class="{'fa-sort-desc': USUA.pagination.orderBy.order === 'desc', 'fa-sort-up': !USUA.pagination.orderBy.order === 'asc'}"></i>
+              </th>
+              <th ng-click="USUA.orderBy('userprogress_progress')">Progresso
+                <i class="fa" ng-show="USUA.pagination.orderBy.key==='userprogress_progress'"
+                  ng-class="{'fa-sort-desc': USUA.pagination.orderBy.order === 'desc', 'fa-sort-up': !USUA.pagination.orderBy.order === 'asc'}"></i>
+              </th>
+              <th ng-click="USUA.orderBy('enabled')">Ativo
+                <i class="fa" ng-show="USUA.pagination.orderBy.key==='enabled'"
+                  ng-class="{'fa-sort-desc': USUA.pagination.orderBy.order === 'desc', 'fa-sort-up': !USUA.pagination.orderBy.order === 'asc'}"></i>
+              </th>
+              <th ng-click="USUA.orderBy('userprogress_user_type')">Perfil
+                <i class="fa" ng-show="USUA.pagination.orderBy.key==='userprogress_user_type'"
+                  ng-class="{'fa-sort-desc': USUA.pagination.orderBy.order === 'desc', 'fa-sort-up': !USUA.pagination.orderBy.order === 'asc'}"></i>
+              </th>
+              <th style="width: 90px; min-width: 90px;"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="linkable" ng-repeat="user in USUA.pagination.list">
+              <td ng-bind="user.nome" ng-click="USUA.viewUser($event, user)"></td>
+              <td ng-bind="user.filial" ng-click="USUA.viewUser($event, user)"></td>
+              <td ng-hide="!USUA.secaoHabilitada" ng-bind="user.secao" ng-click="USUA.viewUser($event, user)"></td>
+              <td ng-bind="user.email" ng-click="USUA.viewUser($event, user)"></td>
+              <td ng-bind="(user.insertedAt | date : 'dd/MM/yyyy \'às\' HH:mm')" ng-click="USUA.viewUser($event, user)">
+              </td>
+              <td ng-bind="user.tentativasProva" ng-click="USUA.viewUser($event, user)"></td>
+              <td ng-bind="USUA.getPercentage(user.progresso)" ng-click="USUA.viewUser($event, user)"></td>
+              <td ng-bind="user.active?'Sim':'Não'" ng-click="USUA.viewUser($event, user)"></td>
+              <td ng-bind="user.type" ng-click="USUA.viewUser($event, user)"></td>
+              <td>
+                <button type="button" class="{{ user.active ? 'btn btn-info btn-sm' : 'btn btn-warning btn-sm' }}"
+                  id="{{'active_'+user.id}}" ng-click="USUA.editStatus(user)"
+                  title="{{user.active ? 'Inativar usuário' : 'Ativar usuário'}}">
+                  <i class="{{user.active ? 'fa fa-check' : 'fa fa-close'}}">{{user.active ? ' ' : ''}}</i>
+                </button>
+                <button type="button" class="btn btn-primary btn-sm" id="{{'ticket_'+user.id}}"
+                  ng-hide="USUA.isEnterprise" ng-click="USUA.resetPassword(user)" title="Redefinir senha do usuário">
+                  <i class="fa fa-mail-forward"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="box-footer clearfix">
+        <ul class="pagination pagination-sm no-margin pull-right">
+          <li ng-click="USUA.pagination.prev()" ng-class="{'disabled': USUA.pagination.page===0}"><a href="#">«</a>
+          </li>
+          <li ng-repeat="page in USUA.pagination.range" ng-class="{'disabled': USUA.pagination.page===page}"
+            ng-click="USUA.pagination.goTo(page)">
+            <a href="#" ng-bind="page+1"></a>
+          </li>
+          <li ng-click="USUA.pagination.next()"
+            ng-class="{'disabled': USUA.pagination.page===(USUA.pagination.totalPages-1)}"><a href="#">»</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-12">
+    <button style="margin-right: 30px;" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#modalForm"
+      ng-hide="USUA.isEnterprise" ng-click="USUA.modalForm.open('new', 'Novo Colaborador', 'Cadastrar')">
+      <i class="fa fa-plus"></i> Novo
+    </button>
+    <button class="btn btn-primary btn-lg" ng-click="USUA.generateReport()">
+      Gerar Relatório
+    </button>
+  </div>
+
+  <div class="modal fade" id="modalDetail" tabindex="-1" role="dialog" aria-labelledby="modalForm">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h4 class="modal-title" ng-bind="USUA.userDetail.nome"></h4>
+        </div>
+        <div class="modal-body">
+          <div class="col-sm-12 invoice-col">
+            <b ng-show="USUA.userDetail.ultimoAcesso">Acessado por último:</b>
+            <span ng-show="USUA.userDetail.ultimoAcesso"
+              ng-bind="USUA.userDetail.ultimoAcesso | date : 'dd/MM/yyyy \'às\' HH:mm'"></span>
+            <br ng-show="USUA.userDetail.ultimoAcesso">
+            <b>E-mail:</b>
+            <span ng-bind="USUA.userDetail.email"></span>
+            <br>
+            <b>CPF:</b>
+            <span ng-bind="USUA.userDetail.cpf"></span>
+            <br>
+            <b>Ativo:</b>
+            <span ng-bind="USUA.userDetail.active?'Sim':'Não'"></span>
+            <br>
+            <b>Filial:</b>
+            <span ng-bind="USUA.userDetail.filial"></span>
+            <br>
+            <b ng-hide="!USUA.secaoHabilitada">{{USUA.secaoChaveNome}}:</b>
+            <span ng-hide="!USUA.secaoHabilitada" ng-bind="USUA.userDetail.secao"></span>
+            <br ng-hide="!USUA.secaoHabilitada">
+            <b>Perfil:</b>
+            <span ng-bind="USUA.userDetail.type"></span>
+            <br>
+          </div>
+          <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <label for="USUA.fullGroups">Grupo de Usuários</label>
+            <select name="fullGroups" id="USUA.fullGroups" name="USUA.fullGroups"
+              ng-change="USUA.carregarProgramasGrupo()" class="form-control" ng-model="USUA.selectedGrupoDetail"
+              required>
+              <option ng-repeat="item in USUA.userDetail.grupos" value="{{item.id}}">{{item.nome}}</option>
+            </select>
+          </div>
+          <div>
+            <table class="table table-hover">
+              <thead>
+                <tr style="background-color: #C1C1C1">
+                  <th>Programa</th>
+                  <th>Versão</th>
+                  <th>Progresso</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr ng-repeat="prog in USUA.programasFiltrados" ng-if="USUA.programasFiltrados.length"
+                  ng-click="USUA.viewPrograma(prog)">
+                  <td ng-bind="prog.nome"></td>
+                  <td ng-bind="prog.versao"></td>
+                  <td ng-bind="USUA.getPercentage(prog.progresso.progresso)"></td>
+                  <td ng-bind="prog.active ? 'Ativo' : 'Inativo'"></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="well">
+            <h4>
+              <strong>{{USUA.programaSelecionado.nome}}</strong>
+            </h4>
+            <div>
+              <p>
+                <strong>Etapas concluídas:</strong>
+              </p>
+              <table style="border-top: 5px solid transparent;border-bottom: 20px solid transparent">
+                <tbody>
+                  <tr ng-repeat="etapa in USUA.etapas | orderBy:'order'">
+                    <td>{{etapa.text}} &nbsp;</td>
+                    <td style="padding-left: 10px">
+                      <i class="fa"
+                        ng-class="{'fa-check text-success': USUA.programaSelecionado.progresso.etapasConcluidas[etapa.id],
+                                     'fa-times text-danger': !USUA.programaSelecionado.progresso.etapasConcluidas[etapa.id]}"></i>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div style="padding-bottom: 5px;">
+              <p>
+                <strong>Tentativas de prova:</strong>
+              </p>
+              <p ng-hide="USUA.programaSelecionado.tentativasProva.length">Nenhuma prova iniciada!</p>
+              <table class="table table-striped" ng-show="USUA.programaSelecionado.tentativasProva.length"
+                style="border: 1px solid black; padding: 5px">
+                <thead>
+                  <tr>
+                    <th>Início</th>
+                    <th>Término</th>
+                    <th>Acertos</th>
+                    <th>Erros</th>
+                    <th>Nota</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr ng-repeat="prova in USUA.programaSelecionado.tentativasProva">
+                    <td ng-bind="prova.horaInicio"></td>
+                    <td ng-bind="prova.horaTerminoCliente"></td>
+                    <td ng-bind="prova.acertos"></td>
+                    <td ng-bind="prova.erros"></td>
+                    <td ng-bind="prova.nota|number:2"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div>
+
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-info"
+            ng-click="USUA.modalGrupo.open('edit', 'Grupo Colaborador', 'Salvar', USUA.userDetail)">
+            <i class="fa fa-users"></i> Grupo
+          </button>
+          <button type="button" class="btn btn-info"
+            ng-click="USUA.modalPerfil.open('edit', 'Perfil Colaborador', 'Salvar', USUA.userDetail)"
+            ng-show="USUA.user.type === 'ADMINISTRADOR'">
+            <i class="fa fa-user"></i> Perfil
+          </button>
+          <button type="button" class="btn btn-primary" ng-click="USUA.resetPassword(USUA.userDetail)"
+            ng-hide="USUA.isEnterprise">
+            <i class="fa fa-mail-forward"></i> Redefinir senha
+          </button>
+          <button type="button" class="btn btn-success"
+            ng-click="USUA.modalForm.open('edit', 'Editar Colaborador', 'Salvar', USUA.userDetail)">
+            <i class="fa fa-edit"></i> Editar
+          </button>
+          <button ng-hide="USUA.user.type === 'OPERADOR'" class="btn btn-danger" id="{{'del_'+USUA.userDetail.id}}"
+            ng-bootbox-confirm="Tem certeza que deseja deletar o usuário selecionado?"
+            ng-bootbox-confirm-action="USUA.deleteUser(USUA.userDetail)" title="Remover usuário">
+            <i class="fa fa-trash"></i> Remover
+          </button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">
+            <i class="fa fa-close"></i> Fechar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="modalPerfil" tabindex="-1" role="dialog" aria-labelledby="modalForm">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h4 class="modal-title" ng-bind="USUA.userDetail.nome"></h4>
+        </div>
+        <div class="modal-body">
+          <div>
+            <label>Perfil</label>
+            <select class="form-control" id="ddl_perfil" ng-model="USUA.modalPerfil.model.perm"
+              ng-change="USUA.modalPerfil.changePermissaoP()">
+              <option value="admin">Administrador</option>
+              <option value="">Colaborador</option>
+              <option value="opera">OPERADOR</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" ng-click="USUA.modalPerfil.save()">
+            <i class="fa fa-edit"></i> Salvar</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">
+            <i class="fa fa-close"></i> Fechar </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="modalGrupo" tabindex="-1" role="dialog" aria-labelledby="modalForm">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h4 class="modal-title" ng-bind="USUA.userDetail.nome"></h4>
+        </div>
+        <div class="modal-body">
+          <div>
+            <label for="USUA.modalGrupo.model.grupoId">Grupo de Usuários</label>
+            <select id="USUA.modalGrupo.model.grupoId" name="USUA.modalGrupo.model.grupoId" class="form-control"
+              ng-model="USUA.modalGrupo.model.grupoId" required>
+              <option ng-repeat="item in USUA.fullGroups" value="{{item.id}}">{{item.nome}}</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" ng-click="USUA.modalGrupo.save()">
+            <i class="fa fa-edit"></i> Salvar</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">
+            <i class="fa fa-close"></i> Fechar </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="modalForm" tabindex="-1" role="dialog" aria-labelledby="modalForm">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h4 class="modal-title" ng-bind="USUA.modalForm.title"></h4>
+        </div>
+        <div class="modal-body">
+          <form role="form" name="userForm">
+            <div class="box-body">
+              <div class="form-group">
+                <label for="grupoUsuario_1">Grupo de Usuários</label>
+                <select id="grupoUsuario_1" name="USUA.modalForm.model.grupoId" class="form-control"
+                  ng-model="USUA.modalForm.model.grupoId" disabled required>
+                  <option ng-repeat="item in USUA.fullGroups" value="{{item.id}}">{{item.nome}}</option>
+                </select>
+              </div>
+              <div class="form-group" ng-class="{'has-error': USUA.modalForm.error.nome}">
+                <label for="nome_2">Nome Completo</label>
+                <input type="text" class="form-control" id="nome_2" name="nome" ng-model="USUA.modalForm.model.nome"
+                  ng-blur="USUA.validField('nome')" ng-change="USUA.validField('nome')" required autocomplete="off">
+                <span class="control-label" ng-show="USUA.modalForm.error.nome">* Campo
+                  requerido!</span>
+              </div>
+              <div class="form-group" ng-class="{'has-error': USUA.modalForm.error.cpf}">
+                <label for="cpf_1">CPF</label>
+                <input type="text" class="form-control" id="cpf_1" name="cpf" ng-model="USUA.modalForm.model.cpf"
+                  ng-blur="USUA.validField('cpf')" ng-change="USUA.validField('cpf')" required autocomplete="off"
+                  ng-disabled="USUA.modalForm.doing === 'edit'">
+                <span class="control-label" ng-show="USUA.modalForm.error.cpf">* Campo requerido!</span>
+              </div>
+              <div class="form-group" ng-class="{'has-error': USUA.modalForm.error.email}">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" name="email" ng-model="USUA.modalForm.model.email"
+                  ng-blur="USUA.validField('email')" ng-change="USUA.validField('email')" required autocomplete="off"
+                  ng-disabled="USUA.modalForm.doing === 'edit'">
+                <span class="control-label" ng-show="USUA.modalForm.error.email">* Campo
+                  requerido!</span>
+                <span class="control-label" ng-show="USUA.modalForm.error.email">Email inválido!</span>
+              </div>
+              <div class="form-group" ng-if="USUA.modalForm.doing === 'new'">
+                <label for="informProgram">O usuário realizará o treinamento em um dos programas anteriores?<i
+                    style="font-size: .7em" class="fa text-danger"></i></label>
+                <br>
+                <label class="radio-inline"><input id="informProgram" type="radio"
+                    ng-disabled="USUA.fullPrograms.length === 0" ng-model="USUA.modalForm.model.informProgram"
+                    name="informProgram" value="true">Sim</label>
+                <label class="radio-inline"><input id="informProgram2" type="radio"
+                    ng-model="USUA.modalForm.model.informProgram" name="informProgram" value="false">Não</label>
+              </div>
+              <div class="form-group" ng-if="USUA.modalForm.model.informProgram === 'true'">
+                <label for="informProgram">Selecione os programas que o usuário realizará<i style="font-size: .7em"
+                    class="fa fa-asterisk text-danger"></i></label>
+                <select id="programas-single" name="programas-single" class="form-control"
+                  ng-model="USUA.programSelected" ng-change="USUA.addProgramList(USUA.programSelected)">
+                  <option ng-repeat="program in USUA.fullPrograms" ng-value="program">
+                    {{program.versao}} - {{program.nome}}</option>
+                </select>
+                </br>
+                OBS: Se o programa ativo não for selecionado, por padrão ele será o último a ser realizado.
+              </div>
+              <table class="table table-hover" ng-show="USUA.selectedPrograms.length">
+                <thead>
+                  <tr style="background-color: #C1C1C1">
+                    <th></th>
+                    <th>Ordem</th>
+                    <th>Programa</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr ng-repeat="program in USUA.selectedPrograms track by $index">
+                    <th class="col-sm-2">
+                      <button type="button" class="btn" style="border: solid 1px #C1C1C1"
+                        ng-click="USUA.sortProgram(program, 'up')">
+                        <i class="fa fa-sort-up"></i>
+                      </button>&nbsp;
+                      <button type="button" class="btn" style="border: solid 1px #C1C1C1"
+                        ng-click="USUA.sortProgram(program, 'down')">
+                        <i class="fa fa-sort-down"></i>
+                      </button>
+                    </th>
+                    <th class="col-sm-2">{{$index + 1}}º.</label></th>
+                    <th class="col-sm-7">{{program.versao}} - {{program.nome}}</label></th>
+                    <th class="col-sm-1">
+                      <button type="button" class="btn btn-danger btn-sm" id="{{'del_'+user.id}}"
+                        ng-click="USUA.removeProgramList(program)">
+                        <i class="fa fa-trash"></i>
+                      </button>
+                    </th>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="form-group" ng-hide="USUA.modalForm.doing === 'edit'">
+                <input type="checkbox" id="ticketSenha" ng-model="USUA.modalForm.model.ticketSenha">
+                <label for="ticketSenha">Enviar link para redefinição de senha por email?</label>
+              </div>
+              <div class="form-group" ng-class="{'has-error': USUA.modalForm.error.senha}"
+                ng-hide="USUA.modalForm.doing === 'edit' || USUA.modalForm.model.ticketSenha">
+                <label for="senha">Senha</label>
+                <input type="password" class="form-control" id="senha" name="senha"
+                  ng-model="USUA.modalForm.model.senha" placeholder="******" ng-blur="USUA.validField('senha')"
+                  ng-change="USUA.validField('senha')" autocomplete="off">
+                <span class="control-label" ng-show="USUA.modalForm.error.senha">* Campo
+                  requerido!</span>
+              </div>
+              <div class="form-group" ng-class="{'has-error': USUA.modalForm.error.confirmSenha}"
+                ng-hide="USUA.modalForm.doing === 'edit' || USUA.modalForm.model.ticketSenha">
+                <label for="senha">Confirmar Senha</label>
+                <input type="password" class="form-control" id="confirmSenha" name="confirmSenha"
+                  ng-model="USUA.modalForm.model.confirmSenha" placeholder="******"
+                  ng-blur="USUA.validField('confirmSenha')" ng-change="USUA.validField('confirmSenha')"
+                  autocomplete="off">
+                <span class="control-label" ng-show="USUA.modalForm.error.confirmSenha">* Campo
+                  requerido!</span>
+                <span class="control-label alert-danger"
+                  ng-show="USUA.modalForm.model.confirmSenha !== USUA.modalForm.model.senha">* Senhas não
+                  correspondem!</span>
+              </div>
+              <div class="form-group" ng-class="{'has-error': USUA.modalForm.error.filialId}">
+                <label for="filialId">Filial</label>
+                <select id="filialId" name="filialId" class="form-control" ng-model="USUA.modalForm.model.filialId"
+                  ng-disabled="USUA.modalForm.doing === 'new' && USUA.defaultBranchSelected()"
+                  ng-change="USUA.validField('filialId')">
+                  <option ng-repeat="filial in USUA.filiais" value="{{filial.id}}">{{filial.nome}}</option>
+                </select>
+                <span class="control-label" ng-show="USUA.modalForm.error.filialId">* Campo requerido!</span>
+              </div>
+              <div class="form-group" ng-hide="USUA.modalForm.doing === 'edit' || USUA.modalForm.model.ticketSenha">
+                <p class="">- A senha deverá ser composta no mínimo com 6 caracteres compostos de
+                  letras e números.</p>
+                <p class="">- Atenção: Sua senha é intransferível e não deve ser revelada a outras
+                  pessoas;</p>
+              </div>
+              <div class="form-group">
+                <input type="checkbox" id="isAtivo" ng-model="USUA.modalForm.model.isAtivo">
+                <label for="isAtivo">Ativo</label>
+              </div>
+              <div class="form-group">
+                <input type="checkbox" id="removerEstatistica_1" ng-model="USUA.modalForm.model.removerEstatistica">
+                <label for="removerEstatistica_1">Remover da Estatística</label>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-warning pull-left"
+            ng-click="USUA.modalForm.clearModalForm()">Limpar</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+          <button type="button" class="btn btn-success" ng-if="USUA.selectedPrograms.length < 2"
+            ng-click="USUA.modalForm.save()" ng-bind="USUA.modalForm.button" ng-disabled="userForm.$invalid"></button>
+          <button type="button" ng-bootbox-confirm="A ordem de treinamento está correta?"
+            ng-if="USUA.modalForm.doing === 'new' && USUA.selectedPrograms.length > 1" ng-bind="USUA.modalForm.button"
+            ng-disabled="userForm.$invalid" ng-bootbox-confirm-action="USUA.modalForm.save()"
+            class="btn btn-success"></button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="modalResetPassword" tabindex="-1" role="dialog" aria-labelledby="modalForm">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h4 class="modal-title">Redefinir senha via link</h4>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <h4 id="email" name="email" style="text-align: center;">
+              Também enviamos um email para <b>{{USUA.userTicketPassword.email}}</b> com o link de redefinição de senha
+              </p>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="resetPasswordLabel">Usuário:</label>
+              <input type="text" class="form-control" id="nome" name="nome" ng-model="USUA.userTicketPassword.nome"
+                disabled>
+            </div>
+            <div class="form-group">
+              <label for="nome">Link para redefinir a senha novamente:</label>
+              <input type="text" class="form-control" name="passwordTicket" id="passwordTicket" disabled>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">
+              <i class="fa fa-close"></i> Fechar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+</app-template>

@@ -1,0 +1,264 @@
+<app-template app-ref="DOCU.appRef">
+  <script type="text/javascript" src='../../common/services/common.text-angular-setup.service.js'></script>
+  <div class="col-xs-12">
+    <div class="form-group">
+      <label for="DOCU.dropGrupos">Grupo de Usuários</label>
+      <select name="dropGrupos" id="DOCU.dropGrupos" name="DOCU.dropGrupos" ng-change="DOCU.update()"
+        class="form-control" ng-model="DOCU.selectedGrupo" required>
+        <option ng-repeat="item in DOCU.dropGrupo" value="{{item.id}}">{{item.nome}}</option>
+      </select>
+    </div>
+  </div>
+  <div class="col-md-12">
+    <div class="box box-primary">
+      <div class="box-header">
+        <h3 class="box-title">Todos os Documentos</h3>
+        <div class="box-tools">
+          <div class="input-group">
+            <input type="text" name="search" class="form-control input-sm pull-right" style="width: 150px;"
+              placeholder="Pesquisar" ng-model="DOCU.pagination.search"
+              ng-change="DOCU.perquisar(DOCU.pagination.search)">
+            <div class="input-group-btn">
+              <button class="btn btn-sm btn-default"><i class="fa fa-search"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="box-body table-responsive no-padding">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>Versão</th>
+              <th>Nome</th>
+              <th>Registro</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="linkable" ng-repeat="versaoDocumento in DOCU.pagination.list">
+              <td ng-bind="versaoDocumento.versao" ng-click="DOCU.viewVersao($event, versaoDocumento)"></td>
+              <td ng-bind="versaoDocumento.nome||((documento.nome | limitTo:60)+'...')"
+                ng-click="DOCU.viewVersao($event, versaoDocumento)"></td>
+              <td ng-bind="versaoDocumento.insertedAt | date : 'dd/MM/yyyy \'às\' HH\'h\'mm\'m\' '"
+                ng-click="DOCU.viewVersao($event, versaoDocumento)"></td>
+              <td>
+                <button class="btn btn-icon btn-danger" data-toggle="modal" data-target="#modalConfirmDel"
+                  title="Remover versão" ng-click="DOCU.remove(versaoDocumento)" id="del_{{versaoDocumento.id}}">
+                  <i class="fa fa-trash"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="col-md-12">
+          <h3 class="help-block" ng-hide="DOCU.pagination.list.length">Nenhum resultado encontrado!</h3>
+        </div>
+        <div class="box-footer clearfix">
+          <ul class="pagination pagination-sm no-margin pull-right">
+            <li ng-click="DOCU.pagination.prev()" ng-class="{'disabled': DOCU.pagination.page===0}"><a href="#">«</a>
+            </li>
+            <li ng-repeat="page in DOCU.pagination.range" ng-class="{'disabled': DOCU.pagination.page===page}"
+              ng-click="DOCU.pagination.goTo(page)">
+              <a href="#" ng-bind="page+1"></a>
+            </li>
+            <li ng-click="DOCU.pagination.next()"
+              ng-class="{'disabled': DOCU.pagination.page===(DOCU.pagination.totalPages-1)}"><a href="#">»</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-12">
+    <button class="btn btn-primary btn-lg" ng-click="DOCU.modalForm.open('new', 'Nova Versão', 'Cadastrar')"
+      ng-show="!DOCU.showDocs"><i class="fa fa-plus"></i> Novo </button>
+  </div>
+  <br>
+  <div class="col-md-12" ng-show="DOCU.showDocs">
+    <div class="box box-primary">
+      <div class="box-header">
+        <h3 class="box-title">Documentos Disponíveis de <b>{{DOCU.versaoDetail.nome}}</b></h3>
+        <button class="btn btn-success pull-right" ng-click="DOCU.save()"
+          ng-disabled="DOCU.editor.model===DOCU.editor._bkp && ((DOCU.editor.assunto === DOCU.editor._assunto && DOCU.editor.model===DOCU.editor._bkp) && DOCU.editor.titulo === DOCU.editor._titulo) ">
+          <i class="fa fa-save"></i>
+          Salvar
+        </button>
+        <button class="btn btn-default pull-right" ng-click="DOCU.cancelar()">
+          Cancelar
+        </button>
+      </div>
+      <div class="box-body table-responsive no-padding">
+        <div class="col-md-12">
+          <ul class="nav nav-tabs">
+            <li ng-repeat="doc in DOCU.documentos" ng-class="{'active': DOCU.editor.active===doc.name}">
+              <a href="#" ng-bind="doc.title" ng-click="DOCU.setActive(doc)"></a>
+            </li>
+          </ul>
+        </div>
+        <div class="col-md-12" ng-show="DOCU.editor.showNomeTitulo">
+          <form name="editor">
+            <div class="form-group">
+              <label for="titulo">Título</label>
+              <input name="titulo" class="form-control" id="titulo" ng-model="DOCU.editor.titulo" required />
+            </div>
+          </form>
+        </div>
+        <div class="col-md-12" ng-show="DOCU.editor.showAssunto">
+          <form name="editor">
+            <div class="form-group">
+              <label for="assunto">Assunto</label>
+              <input name="assunto" class="form-control" id="assunto" ng-model="DOCU.editor.assunto" required></input>
+            </div>
+          </form>
+        </div>
+        <div class="col-md-12">
+          <form name="editor">
+            <div class="form-group">
+              <text-angular name="editorDocumento" ng-model="DOCU.editor.model" ta-toolbar="DOCU.editor.options.toolbar"
+                required></text-angular>
+            </div>
+          </form>
+          <button class="btn btn-success" ng-click="DOCU.openModalDocs()">
+            <i class="fa fa-bars" aria-hidden="true"></i> Mostrar documentos
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="modalForm" tabindex="-1" role="dialog" aria-labelledby="modalForm">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+              aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" ng-bind="DOCU.modalForm.title"></h4>
+        </div>
+        <div class="modal-body">
+          <form role="form" name="userForm">
+            <div class="box-body">
+              <div class="form-group">
+                <label for="versao">Versão</label>
+                <input type="text" class="form-control" id="versao" name="versao" ng-model="DOCU.modalForm.model.versao"
+                  required>
+                <p class="text-danger" ng-if="DOCU.modalForm.validations.versao"
+                  ng-bind="DOCU.modalForm.validations.versao"></p>
+              </div>
+              <div class="form-group">
+                <label for="nome">Nome</label>
+                <input type="text" class="form-control" id="nome" name="nome" ng-model="DOCU.modalForm.model.nome"
+                  required>
+                <p class="text-danger" ng-if="DOCU.modalForm.validations.nome"
+                  ng-bind="DOCU.modalForm.validations.nome"></p>
+              </div>
+              <div class="form-group">
+                <label for="nome">Descrição</label>
+                <textarea class="form-control" name="descricao" id="descricao" cols="30" rows="5"
+                  ng-model="DOCU.modalForm.model.descricao"></textarea>
+              </div>
+              <div class="form-group" ng-show="!DOCU.isPrimeiraVersao || DOCU.modalForm.doing !== 'edit'">
+                <input type="checkbox" id="copyContent" ng-model="DOCU.modalForm.model.copyContent">
+                <label for="copyContent">Desejo copiar o conteúdo da versão ativa de documentos</label>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-warning pull-left"
+            ng-click="DOCU.modalForm.clearModalForm()">Limpar</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+          <button type="button" class="btn btn-success" ng-click="DOCU.modalForm.save()">Salvar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="modalDetail" tabindex="-1" role="dialog" aria-labelledby="modalForm">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+              aria-hidden="true">&times;</span></button>
+          <h4>Detalhes de <b>{{DOCU.versaoDetail.nome}}</b></h4>
+        </div>
+        <div class="modal-body">
+          <div>
+            <p><strong>Nome:</strong> <span ng-bind="DOCU.versaoDetail.nome"></span></p>
+            <p><strong>Versão: </strong> <span ng-bind="DOCU.versaoDetail.versao"></span></p>
+            <p><strong>Descrição: </strong> <span ng-bind="DOCU.versaoDetail.descricao"></span></p>
+            <p><strong>Data Criação: </strong> <span
+                ng-bind="DOCU.versaoDetail.insertedAt | date : 'dd/MM/yyyy \'às\' HH:mm'"></span></p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-info" ng-click="DOCU.editar(DOCU.versaoDetail)">
+            <i class="fa fa-user"></i> Documentos </button>
+          <button type="button" class="btn btn-primary"
+            ng-click="DOCU.modalForm.open('edit', 'Editar Versão', 'Salvar', DOCU.versaoDetail)">
+            <i class="fa fa-edit"></i> Editar </button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">
+            <i class="fa fa-close"></i> Fechar </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="modalDocs" tabindex="-1" role="dialog" aria-labelledby="modalForm">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+              aria-hidden="true">&times;</span></button>
+          <h4>Lista de documentos do repositório</b></h4>
+        </div>
+        <div class="modal-body">
+            <div class="box-body table-responsive no-padding">
+              <p>O arquivo será inserido na aba que está sendo visualizada no momento.</p>
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Criador</th>
+                    <th>Nome</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="linkable" al ng-repeat="doc in DOCU.listDocs" ng-click="DOCU.insert(doc)">
+                    <td ng-bind="doc.criador"></td>
+                    <td ng-bind="doc.nome"></td>
+                    <td>
+                      <button class="btn btn-icon btn-danger" ng-disabled="doc.url === ''"
+                        title="Remover imagem do documento" ng-click="DOCU.removeImage(doc)" id="del_{{versaoDocumento.id}}">
+                        <i class="fa fa-trash"></i>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="modalConfirmDel" tabindex="-1" role="dialog" aria-labelledby="modalForm"
+    data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click=""><span
+              aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">Confirme sua ação de exclusão</h4>
+        </div>
+        <div class="modal-body">
+          <label>
+            Tem certeza que deseja remover o Versionamento de Documentos?
+          </label>
+          <br>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-primary" data-dismiss="modal" ng-click="DOCU.confirmRemove(false)">
+            <i class="fa fa-close"></i>
+            Não </button>
+          <button type="button" class="btn btn-danger" data-dismiss="modal" ng-click="DOCU.confirmRemove(true)">
+            <i class="fa fa-check"></i> Sim </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-template>

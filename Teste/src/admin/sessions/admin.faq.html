@@ -1,0 +1,88 @@
+<app-template app-ref="FAQ.appRef">
+  <div class="col-md-12">
+    <div class="col-md-12">
+      <div class="input-group" style="padding-bottom: 5px;">
+        <div class="input-group-btn">
+          <input ng-model="FAQ.pagination.search" type="text" name="search" class="form-control input-sm" style="width: 150px;"
+            placeholder="Pesquisar">
+          <button class="btn btn-sm btn-default">
+            <i class="fa fa-search"></i>
+          </button>
+        </div>
+      </div>
+      <br>
+      <button class="btn btn-primary" data-toggle="modal" data-target="#modalNewFaq"
+        ng-click="FAQ.formNewFaq.clear()">Novo &nbsp;<i class="fa fa-plus"></i></button>
+    </div>
+    <div class="col-md-12">
+      <div style="padding-bottom: 15px" ng-repeat="faq in FAQ.filteredFaqs = (FAQ.pagination.list | filter: FAQ.pagination.search) track by $index">
+        <div style="border-bottom: 1px solid black">
+          <div style="height: 35px">
+            <button class="pull-right btn btn-danger btn-sm" style="width: 34.02px; margin-left: 10px"
+              ng-hide="faq.editing" ng-bootbox-confirm="Tem certeza que deseja apagar o FAQ '{{faq.item}}'?"
+              ng-bootbox-confirm-action="FAQ.deleteFaq(faq)">
+              <i class="fa fa-trash"></i>
+            </button>
+            <button class="pull-right btn btn-primary btn-sm" style="width: 34.02px" ng-hide="faq.editing"
+              ng-click="FAQ.edit(faq)">
+              <i class="fa fa-edit"></i>
+            </button>
+            <button class="pull-right btn btn-warning btn-sm" style="width: 34.02px; margin-left: 10px"
+              ng-show="faq.editing" ng-click="FAQ.cancelEdit(faq)">
+              <i class="fa fa-remove"></i>
+            </button>
+            <button class="pull-right btn btn-success btn-sm" style="width: 34.02px" ng-show="faq.editing"
+              ng-click="FAQ.updateFaq(faq)">
+              <i class="fa fa-floppy-o"></i>
+            </button>
+          </div>
+          <div>
+            <h3 ng-hide="faq.editing" ng-bind="faq.item"></h3>
+            <input type="text" class="form-control" value="Title FAQ" ng-show="faq.editing" ng-model="faq.item">
+            <p ng-hide="faq.editing" ng-repeat="paragraph in faq.subItems track by $index" ng-bind="paragraph"></p>
+            <textarea class="form-control" name="" id="" cols="30" rows="10" ng-show="faq.editing"
+              ng-model="faq.subItemsJoined"></textarea>
+          </div>
+        </div>
+      </div>
+      <h3 class="help-block" ng-hide="FAQ.filteredFaqs.length">Nenhum resultado encontrado.</h3>
+    </div>
+  </div>
+  <div class="modal fade" id="modalNewFaq" tabindex="-1" role="dialog" aria-labelledby="modalNewFaq">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+              aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">Adicionar novo FAQ</h4>
+        </div>
+        <div class="modal-body">
+          <div class="alert no-margin" ng-show="FAQ.formNewFaq.error||FAQ.formNewFaq.success"
+            ng-class="{'alert-danger': FAQ.formNewFaq.error, 'alert-success': FAQ.formNewFaq.success}">
+            <p ng-bind="FAQ.formNewFaq.error || FAQ.formNewFaq.success"></p>
+          </div>
+          <form name="formNewFaq" ng-class="{'has-error': FAQ.formNewFaq.error}">
+            <div class="form-group" ng-class="{'has-error': formNewFaq.item.$error.required}">
+              <label for="item">Título</label>
+              <input type="text" name="item" id="item" class="form-control" ng-model="FAQ.formNewFaq.model.item"
+                required>
+              <span class="control-label" ng-show="formNewFaq.item.$error.required">* Campo requerido!</span>
+            </div>
+            <div class="form-group" ng-class="{'has-error': formNewFaq.subitems.$error.required}">
+              <label for="subitems">Conteúdo</label>
+              <textarea name="subitems" id="subitems" cols="30" rows="10" class="form-control"
+                ng-model="FAQ.formNewFaq.model.subItemsJoined" required></textarea>
+              <span class="control-label" ng-show="formNewFaq.subitems.$error.required">* Campo requerido!</span>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-warning pull-left" ng-click="FAQ.formNewFaq.clear()">Limpar</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+          <button type="button" class="btn btn-success" ng-click="FAQ.formNewFaq.create(FAQ.formNewFaq.model)"
+            ng-disabled="formNewFaq.$invalid">Salvar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-template>
