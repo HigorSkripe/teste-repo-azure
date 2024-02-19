@@ -1,0 +1,82 @@
+<header class="header">
+  <a href="/" class="logo">
+    <img ng-src="{{FORGOT.srcLogo}}" alt="Eticca" />
+  </a>
+  <nav class="navbar navbar-static-top" role="navigation">
+    <div class="navbar-left"></div>
+  </nav>
+</header>
+<div class="wrapper row-offcanvas">
+  <aside class="right-side strech">
+    <section class="content-header">
+      <h1>Atualizar senha</h1>
+      <ol class="breadcrumb">
+        <li>
+          <a href="/"><i class="fa fa-home"></i> Eticca</a>
+        </li>
+        <li class="active">Atualizar Senha</li>
+      </ol>
+    </section>
+    <br />
+    <div class="col-md-12 denuncia">
+      <div class="alert alert-danger" ng-show="!!error" style="margin-left: 0;">
+        <button
+          type="button"
+          class="close"
+          aria-hidden="true"
+          ng-click="error=null"
+        >
+          ×
+        </button>
+        <p ng-bind="error.message"></p>
+      </div>
+      <div class="box box-info">
+        <div class="box-header">
+          <h3 class="box-title">Atualizar minha senha</h3>
+        </div>
+        <div class="box-body">
+          <form role="form" name="forgot" action="" method="post">
+            <div class="form-group">
+              <label for="senha">Nova Senha</label>
+              <input
+                class="form-control"
+                type="password"
+                id="senha"
+                name="senha"
+                autocomplete="off"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <label for="confirmaSenha">Confirme a nova senha</label>
+              <input
+                class="form-control"
+                type="password"
+                id="confirmaSenha"
+                name="confirmaSenha"
+                autocomplete="off"
+                required
+              />
+            </div>
+            <div class="form-group">
+              <p class="help-block">
+                - A senha deverá ser composta no mínimo com 6 caracteres
+                compostos de letras e números.
+              </p>
+              <p class="help-block">
+                - Atenção: Sua senha é intransferível e não deve ser revelada a
+                outras pessoas;
+              </p>
+            </div>
+            <div class="form-group">
+              <button class="btn btn-primary" type="button" ng-click="send()">
+                <i class="fa fa-check"></i>
+                Atualizar
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </aside>
+</div>

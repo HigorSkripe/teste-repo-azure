@@ -1,0 +1,118 @@
+<div style="width: 100%; text-align: -webkit-center">
+  <div class="accLogin" style="text-align: -webkit-center">
+    <img ng-src="{{LOGIN.srcLogo}}" />
+    <div class="wrapper" style="width: 100%; text-align: -webkit-center">
+
+        <!-- Coluna 1 - LOGIN -->
+        <div class="col-md-6 fieldLogin">
+          <div class="titleLogin" style="padding: 10px !important;">
+            Acesso
+          </div>
+          <div class="form-box center-block" style="margin: 0px !important;">
+            <div class="alert alert-success" ng-show="!!success" style="margin: 10px 0;">
+              <button type="button" class="close" aria-hidden="true" ng-click="success=null">×</button>
+              <p ng-bind="success"></p>
+            </div>
+            <div class="header">Portal Compliance</div>
+            <div id="login-box-mobile">
+              <div id="auth0-login-container" style="--vh: 3.px">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Coluna 2 - DENÚNCIAS E FAQ MESCLADAS -->
+        <div class="col-md-5" style="margin-top: 10px; margin-left: 25px;">
+          <div class="form-box center-block row fieldLogin" style="margin: 0px; padding: 5%;">
+            <div class="titleLogin" style="margin-top: -15px;">
+              Denúncias
+            </div>
+            <!-- Conteúdo de Denúncias e FAQ mesclados -->
+            <button class="btn btn-primary btnLDenFaq"  ng-click="LOGIN.openDenuncia('nova')">
+              <i class="fa fa-plus"></i>&nbsp; Reporte &nbsp;
+            </button>
+            <button class="btn btn-primary btnLDenFaq"  ng-click="LOGIN.openDenuncia('busca')">
+              <i class="fa fa-search" aria-hidden="true"></i>&nbsp; Acompanhe &nbsp;
+            </button>
+          </div>
+          <div class="form-box center-block row fieldLogin" style="margin-top: 20px; padding: 5%;">
+            <div class="titleLogin" style="margin-top: -15px;">
+              Suporte
+            </div>
+            <button class="btn btn-primary btnLDenFaq" ng-click="LOGIN.openFaq('busca')">
+              <i class="fa fa-question" aria-hidden="true"></i>&nbsp; Dúvidas &nbsp;
+            </button>
+            <button class="btn btn-primary btnLDenFaq" ng-click="LOGIN.openFaq('email')" data-toggle="modal" data-target="#modalForm">
+              <i class="fa fa-bullhorn" aria-hidden="true"></i>&nbsp; Fale Conosco &nbsp;
+            </button>
+          </div>
+        </div>
+
+    </div>
+    <div class="modal fade" id="modalFaq" tabindex="-1" role="dialog" aria-labelledby="modalForm">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                aria-hidden="true">&times;</span></button>
+          </div>
+          <div class="modal-body">
+            <form role="form" name="userForm">
+              <div class="box-body">
+                <div class="form-group">
+                  <label for="faqAssunto">Assunto</label>
+                  <select class="form-control" id="faqAssunto" ng-model="LOGIN.modalForm.assunto">
+                    <option value="DUVIDA">Dúvida</option>
+                    <option value="PROBLEMA">Problema</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="faqTexto">Dúvida / Problema</label>
+                  <textarea type="text" rows="4" cols="50" class="form-control" id="faqTexto" name="faqTexto"
+                    ng-model="LOGIN.modalForm.texto" required></textarea>
+                  <!-- <p class="text-danger" ng-if="EMPR.filial.modalForm.validations.nome"
+                    ng-bind="EMPR.filial.modalForm.validations.nome">
+                  </p> -->
+                </div>
+
+                <div class="form-group">
+                  <label for="faqName">Nome</label>
+                  <input type="text" class="form-control" id="faqName" name="faqName"
+                    ng-model="LOGIN.modalForm.name" required>
+                  <!-- <p class="text-danger" ng-if="EMPR.filial.modalForm.validations.nome"
+                    ng-bind="EMPR.filial.modalForm.validations.nome">
+                  </p> -->
+                </div>
+                <div class="form-group">
+                  <label for="faqEmail">E-mail</label>
+                  <input type="email" class="form-control" id="faqEmail" name="faqEmail"
+                    ng-model="LOGIN.modalForm.email" required>
+                  <!-- <p class="text-danger" ng-if="EMPR.filial.modalForm.validations.nome"
+                    ng-bind="EMPR.filial.modalForm.validations.nome">
+                  </p> -->
+                </div>
+                <div class="form-group">
+                  <label for="faqTelefone">Telefone</label>
+                  <input type="tel" class="form-control" data-mask id="faqTelefone" name="faqTelefone"
+                    ng-model="LOGIN.modalForm.telefone" required>
+                  <!-- <p class="text-danger" ng-if="EMPR.filial.modalForm.validations.nome"
+                    ng-bind="EMPR.filial.modalForm.validations.nome">
+                  </p> -->
+                </div>
+              </div>
+                <div vc-recaptcha key="reCaptchaSiteKey" on-create="LOGIN.setRcNewDenuncia(widgetId)"
+                  ng-model="recaptchaResponse" style="margin-bottom: 10px"
+                  on-expire="LOGIN.recapchaExpiration()" lang="pt-BR"></div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-warning pull-left"
+              ng-click="LOGIN.modalForm.clearModalForm()">Limpar</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+            <button type="button" class="btn btn-success" ng-click="LOGIN.modalForm.save()">Enviar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

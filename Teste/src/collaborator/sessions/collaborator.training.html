@@ -1,0 +1,11 @@
+<app-template app-ref="TREI.appRef" visible-next-button="true" show-progress="true">
+  <div ng-show="TREI.treinamento">
+    <div class="col-lg-12 text-justify" ng-if="!TREI.videos || TREI.videos.length === 0">
+      <iframe id="curso" width="100%" height="658px"></iframe>
+    </div>
+    <video-treinamento videos="TREI.videos" ng-if="TREI.videos && TREI.videos.length > 0"></video-treinamento>
+  </div>
+  <div class="alert alert-danger no-margin" ng-hide="TREI.treinamento">
+    <p ng-bind="TREI.globalError"></p>
+  </div>
+</app-template>

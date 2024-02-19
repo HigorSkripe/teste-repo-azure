@@ -1,0 +1,23 @@
+<div>
+  <head-menu params="headMenu || {}"></head-menu>
+  <div class="wrapper row-offcanvas row-offcanvas-left">
+    <sidebar-left params="sideBarLeft || { user: {}, menus: [] }" toggle-fn="headMenu.toggleClick"></sidebar-left>
+
+    <aside class="right-side">
+      <content-header></content-header>
+      <section ng-if="showProgress" class="content-header" style="background: transparent; box-shadow: none;">
+        <eticca-progress visible="showProgress"></eticca-progress>
+      </section>
+      <!-- TRANSCLUDE -->
+      <section class="content" ng-transclude>
+      </section>
+
+      <div id="nextBtnDiv" class="row text-center" style="margin: 10px" ng-show="visibleNextButton">
+        <button class="btn btn-primary" ng-click="clickNext()">
+          <i class="fa fa-arrow-right"></i>
+          Próximo
+        </button>
+      </div>
+    </aside>
+  </div>
+</div>

@@ -1,0 +1,66 @@
+<aside class="left-side sidebar-offcanvas scrollMenu" id="{{ params.id }}">
+  <!-- sidebar -->
+  <section class="sidebar">
+    <!-- search form -->
+    <form ng-if="!!params.search" class="sidebar-form">
+      <div class="input-group">
+        <input
+          type="text"
+          name="q"
+          class="form-control"
+          ng-model="params.search.model"
+          placeholder="{{ params.search.placeholder }}"
+          ng-change="params.search.change()"
+        />
+        <span class="input-group-btn">
+          <button
+            type="button"
+            name="search"
+            id="search-btn"
+            class="btn btn-flat"
+            ng-click="params.search.click"
+          >
+            <i class="fa fa-search"></i>
+          </button>
+        </span>
+      </div>
+    </form>
+    <!-- /.search form -->
+    <!-- sidebar menu -->
+    <ul class="sidebar-menu">
+      <li
+        ng-repeat="menu in params.menus"
+        class="treeview"
+        ng-class="{ active: !!menu.active }"
+        id="{{ menu._id }}"
+        ng-hide="menu._hide"
+      >
+        <a
+          ng-href="{{ !!menu.subMenus ? '' : menu.href }}"
+          ng-click="clickMenu(menu)"
+        >
+          <i ng-class="menu.icon"></i> <span ng-bind="menu.text"></span>
+          <i
+            ng-if="!!menu.subMenus && !!menu.subMenus.length"
+            class="fa pull-right"
+            ng-class="{
+              'fa-angle-left': !menu.active,
+              'fa-angle-down': menu.active
+            }"
+          ></i>
+        </a>
+        <ul
+          class="treeview-menu"
+          ng-if="!!menu.subMenus && !!menu.subMenus.length"
+        >
+          <li ng-repeat="subMenu in menu.subMenus" id="{{ subMenu._id }}">
+            <a ng-href="{{ subMenu.href }}" ng-click="clickMenu(menu)">
+              <i class="fa fa-angle-double-right"></i> {{ subMenu.text }}
+            </a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </section>
+  <!-- /.sidebar -->
+</aside>

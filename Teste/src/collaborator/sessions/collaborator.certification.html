@@ -1,0 +1,106 @@
+<app-template app-ref="CERT.appRef" visible-next-button="true" show-progress="true">
+  <div class="col-lg-12 text-justify">
+    <div class="col-md-12" ng-hide="CERT.provaConcluida">
+      <div class="col-md-10 text-center col-md-offset-1">
+        <div class="alert alert-info">
+          Inicie seu exame, ao final de todas questões respondidas, clique em "Concluir e Enviar" para o processamento
+          correto de sua certificação
+        </div>
+      </div>
+    </div>
+    <div class="col-md-12 text-center" ng-hide="CERT.provaVisivel||CERT.provaConcluida">
+      <a class="btn btn-success" ng-click="CERT.click()" ng-disabled="CERT.creatingExam">
+        <i class="fa fa-play"></i>Iniciar Exame</a>
+    </div>
+    <div class="col-md-12" ng-show="CERT.showWarning&&!CERT.provaConcluida">
+      <div class="col-md-10 text-center col-md-offset-1">
+        <alert params="CERT.alertWarning"></alert>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12 prova" ng-hide="CERT.provaConcluida">
+        <div class="form-group" ng-show="CERT.provaVisivel">
+          <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 pull-left">
+            <a style="line-height: 20;" href="#" ng-click="CERT.prevQuestion()"
+              ng-class="{'disabled': CERT.questaoActive<1}">
+              <span class="fa fa-chevron-left fa-2x"></span>
+            </a>
+          </div>
+          <span class="col-xs-9">
+            <div id="question">
+              <h2 class="box-title"
+                ng-bind="'Questão '+(CERT.questaoActive+1)+': '+CERT.questoes[CERT.questaoActive].questao.enunciado">
+              </h2>
+              <br>
+              <div class="resposta"
+                ng-repeat="resp in CERT.questoes[CERT.questaoActive].questao.respostas track by $index">
+                <div class="radio" ng-class="{'checked': CERT.questoes[CERT.questaoActive].resposta===resp}">
+                  <label style="font-size: 1.2em">
+                    <input name="{{CERT.questoes[CERT.questaoActive].nome}}" value="{{resp}}" type="radio"
+                      class="radio-inline" ng-model="CERT.questoes[CERT.questaoActive].resposta"
+                      ng-change="CERT.changeRadio()">
+                    {{resp}}
+                  </label>
+                </div>
+              </div>
+              <br>
+            </div>
+            <div class="text-center">
+              <ul style="margin: 0 auto!important" class="pagination pagination-sm">
+                <li ng-click="CERT.prevQuestion()" ng-class="{'disabled': CERT.questaoActive<1}"><a href="#">«</a></li>
+                <li ng-class="{'disabled': CERT.questaoActive===i}" ng-repeat="(i,el) in CERT.questoes"
+                  ng-click="CERT.goToQuestion(i)">
+                  <a href="#" ng-bind="i+1"></a>
+                </li>
+                <li ng-click="CERT.nextQuestion()"
+                  ng-class="{'disabled': CERT.questaoActive == (CERT.questoes.length-1)}"><a href="#">»</a></li>
+              </ul>
+            </div>
+          </span>
+          <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 pull-right">
+            <a style="line-height: 20;" href="#" ng-click="CERT.nextQuestion()"
+              ng-class="{'disabled': CERT.questaoActive == (CERT.questoes.length-1)}">
+              <span class="fa fa-chevron-right fa-2x"></span>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-12" ng-show="CERT.provaConcluida">
+        <div class="col-md-10 text-center col-md-offset-1">
+          <div class="alert" ng-class="{'alert-success': CERT.nota >= 8, 'alert-danger': CERT.nota < 8}">
+            Prova concluída! Sua nota é: {{CERT.nota | number:2}}<br>
+            <span ng-show="CERT.nota < 8">Infelizmente você não atingiu a nota mínima de aprovação.<br></span>
+            Veja abaixo detalhes de sua nota.
+          </div>
+        </div>
+        <div class="col-md-10 text-left col-md-offset-1">
+          <span class="col-md-12" ng-repeat="cor in CERT.correcao track by $index">
+            <h4 class="box-title" ng-bind="'Questão '+($index+1)+': '+cor.enunciado"></h4>
+            <p>Sua resposta: {{cor.resposta}}</p>
+            <p class="text-success" ng-show="cor.acertou">Acertou!</p>
+            <p class="text-danger" ng-hide="cor.acertou">Errou</p>
+            <p ng-hide="cor.acertou">Resposta certa: {{cor.respostaCerta}}.</p>
+            <br>
+          </span>
+        </div>
+        <div class="col-md-10 text-center col-md-offset-1" ng-show="CERT.nota < 8">
+          <button type="button" class="btn btn-info" ng-click="CERT.tentarNovamente()">Iniciar novo teste</button>
+        </div>
+      </div>
+    </div>
+    <div class="row" ng-show="CERT.errorProvaInit.length">
+      <div class="col-md-12 text-center">
+        <hr>
+        <div class="alert alert-danger">
+          <button type="button" class="close" aria-hidden="true" ng-click="CERT.errorProvaInit=''">×</button>
+          <p ng-bind="CERT.errorProvaInit"></p>
+        </div>
+      </div>
+    </div>
+    <div class="row" ng-show="CERT.provaVisivel&&!CERT.provaConcluida">
+      <div class="col-md-12 text-center">
+        <button type="button" class="btn btn-success" ng-click="CERT.concluir()">Concluir e Enviar</button>
+      </div>
+    </div>
+  </div>
+</app-template>

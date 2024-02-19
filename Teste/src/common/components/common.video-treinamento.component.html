@@ -1,0 +1,50 @@
+<div>
+  <div class="videogular-index-bar" ng-if="videoControlsOpt.pages.length > 1">
+    <nav aria-label="Page navigation">
+      <ul class="pagination">
+        <li>
+          <a aria-label="Previous" ng-click="videoControlsOpt.prev()">
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+        </li>
+        <li>
+          <a
+            ng-repeat="i in videoControlsOpt.pages"
+            ng-click="videoControlsOpt.setVideoIndex(i)"
+            ng-class="{ active: i === videoControlsOpt.active }"
+            >{{ i + 1 }}</a
+          >
+        </li>
+        <li>
+          <a aria-label="Next" ng-click="videoControlsOpt.next()">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+  <div class="videogular-container">
+    <videogular
+      vg-theme="videoConfig.theme"
+      vg-player-ready="onPlayerReady($API)"
+    >
+      <vg-media vg-src="videoConfig.sources" vg-tracks="videoConfig.tracks">
+      </vg-media>
+      <vg-controls>
+        <vg-play-pause-button></vg-play-pause-button>
+        <vg-time-display>{{ currentTime | date: "mm:ss" }}</vg-time-display>
+        <vg-scrub-bar>
+          <vg-scrub-bar-current-time></vg-scrub-bar-current-time>
+        </vg-scrub-bar>
+        <vg-time-display>{{ timeLeft | date: "mm:ss" }}</vg-time-display>
+        <vg-volume>
+          <vg-mute-button></vg-mute-button>
+          <vg-volume-bar></vg-volume-bar>
+        </vg-volume>
+        <vg-fullscreen-button></vg-fullscreen-button>
+      </vg-controls>
+      <vg-overlay-play></vg-overlay-play>
+      <vg-poster vg-url="videoConfig.plugins.poster"></vg-poster>
+    </videogular>
+  </div>
+</div>

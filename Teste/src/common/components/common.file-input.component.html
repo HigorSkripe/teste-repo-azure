@@ -1,0 +1,13 @@
+<div>
+  <label
+    class="control-label"
+    ng-if="params.label"
+    ng-bind="params.label"
+  ></label>
+  <input
+    id="{{ params.id }}"
+    name="{{ params.name }}"
+    type="file"
+    file-model="model"
+  />
+</div>

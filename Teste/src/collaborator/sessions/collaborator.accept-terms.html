@@ -1,0 +1,55 @@
+<app-template app-ref="TERM.appRef" visible-next-button="false" show-progress="true">
+  <div class="col-lg-12">
+    <div ng-bind-html="TERM.termo | rawHtml" ng-show="TERM.termo"></div>
+    <div class="col-md-offset-8 col-md-4 text-center" ng-show="TERM.aceito">
+      <br>
+      <p class="text-success">
+        Aceito em {{TERM.aceitoData.toLocaleDateString('pt-br')}} às {{TERM.aceitoData.toLocaleTimeString('pt-br', {
+        hour12: false, hour: "numeric", minute: "numeric"})}} <i class="fa fa-check"></i>
+      </p>
+      <button id="download_termo" class="btn btn-success" ng-click="TERM.downloadTermo()">
+        <i class="fa fa-download"></i>
+        Baixar Documentos
+      </button>
+    </div>
+    <div class="col-md-offset-8 col-md-2 text-center" ng-hide="TERM.aceito">
+      <br>
+      <button type="button" ng-click="TERM.aceiteClick(false)" class="btn btn-danger" ng-disabled="TERM.processing">
+        Não Concordo
+        <i class="fa fa-undo"></i>
+      </button>
+    </div>
+    <div class=" col-md-2 text-center" ng-hide="TERM.aceito">
+      <br>
+      <button type="button" class="btn btn-success" ng-click="TERM.aceiteClick(true)" ng-disabled="TERM.processing">
+        Concordo
+        <i class="fa fa-check"></i>
+      </button>
+    </div>
+  </div>
+  <div class="modal fade" id="modalTermo" tabindex="-1" role="dialog" aria-labelledby="modalForm" data-backdrop="static"
+    data-keyboard="false" name="principal" id="principal">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"
+            ng-click="TERM.atualizaModal()"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title"></h4>
+        </div>
+        <div class="modal-body">
+          <label>
+            Deseja baixar os documentos?
+          </label>
+          <br>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-success" target="_self" data-dismiss="modal" ng-click="TERM.atualizaModal(true)">
+            <i class="fa fa-download"></i>
+            Baixar Agora </button>
+          <button type="button" class="btn btn-default" data-dismiss="modal" ng-click="TERM.atualizaModal(false)">
+            <i class="fa fa-close"></i> Baixar Depois </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-template>

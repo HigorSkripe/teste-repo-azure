@@ -1,0 +1,213 @@
+<app-template app-ref="DASH.appRef">
+  <div class="text-justify" id="dashboard">
+    <div class="row">
+      <div class="col-sm-12">
+        <h3 class="text-uppercase">Seja bem-vindo ao <strong>{{DASH.programaAtivo.nome}}</strong></h3>
+        <small ng-if="!!DASH.user.penultimoAcesso" class="pull-left text-info">Último acesso em {{
+          DASH.user.penultimoAcesso | date : 'dd/MM/yyyy \'às\' HH:mm' }} com endereço {{ DASH.user.penultimoIpAddress
+          }} </small>
+        <br>
+        <br>
+        <hr>
+      </div>
+      <div class="col-md-12 text-center">
+        <div class="col-md-12">
+          <h2 style="font-size: 1.4em">Status do programa:</h2>
+          <c3chart bindto-id="chart-progress" chart-data="DASH.progress.datapoints"
+            chart-columns="DASH.progress.datacolumns">
+            <chart-gauge min="0" max="100" units=" completo" width="30">
+            </chart-gauge>
+          </c3chart>
+          <br>
+          <p ng-hide="DASH.user.numEtapasConcluidas">Você ainda não iniciou o programa.</p>
+
+          <div ng-show="DASH.user.numEtapasConcluidas===DASH.user.totalEtapas">
+            <p style="font-size: 1.4em" class="text-success">Parabéns! Você concluiu o programa.</p>
+          </div>
+          <div ng-show="DASH.user.numEtapasConcluidas===DASH.user.totalEtapas&&DASH.startWithOldProgramValue">
+            <p style="font-size: 1.4em" class="text-warning">Você ainda possui programa(s) para concluir!</p>
+          </div>
+          <button class="btn btn-primary" ng-hide="!DASH.user.startOldProgram && DASH.user.numEtapasConcluidas === DASH.user.totalEtapas" ng-click="DASH.goTo()">
+            {{DASH.getStatusMessage()}}
+          </button>
+        </div>
+
+        <div class="col-md-4 text-left">
+          <br>
+          <div class="box box-primary">
+            <div class="box-header" style="cursor: move;">
+              <i class="ion ion-clipboard"></i>
+              <h3 class="box-title">Etapas Concluídas</h3>
+            </div>
+            <!-- /.box-header -->
+            <div class="box-body" ng-show="DASH.keyTerm">
+              <ul class="todo-list ui-sortable">
+                <li>
+                  <span class="text">{{DASH.keyIntro}}</span>
+                  <small class="label label-primary" ng-show="DASH.user.etapasConcluidas.introducao"><i
+                      class="fa fa-clock-o"></i> {{DASH.user.etapasConcluidas.introducao | date : 'dd/MM/yyyy \'às\'
+                    HH:mm'}} </small>
+                </li>
+                <li>
+                  <!-- todo text -->
+                  <span class="text">Treinamento</span>
+                  <!-- Emphasis label -->
+                  <small class="label label-primary" ng-show="DASH.user.etapasConcluidas.treinamento"><i
+                      class="fa fa-clock-o"></i> {{DASH.user.etapasConcluidas.treinamento | date : 'dd/MM/yyyy \'às\'
+                    HH:mm'}}</small>
+                  <!-- General tools such as edit or delete-->
+                </li>
+                <li>
+                  <!-- todo text -->
+                  <span class="text">{{DASH.keyCEtica}}</span>
+                  <!-- Emphasis label -->
+                  <small class="label label-primary" ng-show="DASH.user.etapasConcluidas.codigoetica"><i
+                      class="fa fa-clock-o"></i> {{DASH.user.etapasConcluidas.codigoetica | date : 'dd/MM/yyyy \'às\'
+                    HH:mm'}}</small>
+                  <!-- General tools such as edit or delete-->
+                </li>
+                <li>
+                  <!-- todo text -->
+                  <span class="text">{{DASH.keyCConduta}}</span>
+                  <!-- Emphasis label -->
+                  <small class="label label-primary" ng-show="DASH.user.etapasConcluidas.codigoconduta"><i
+                      class="fa fa-clock-o"></i> {{DASH.user.etapasConcluidas.codigoconduta | date : 'dd/MM/yyyy \'às\'
+                    HH:mm'}}</small>
+                  <!-- General tools such as edit or delete-->
+                </li>
+                <li>
+                  <!-- todo text -->
+                  <span class="text">Certificação</span>
+                  <!-- Emphasis label -->
+                  <small class="label label-primary" ng-show="DASH.user.etapasConcluidas.certificacao"><i
+                      class="fa fa-clock-o"></i> {{DASH.user.etapasConcluidas.certificacao | date : 'dd/MM/yyyy \'às\'
+                    HH:mm'}}</small>
+                  <!-- General tools such as edit or delete-->
+                </li>
+                <li>
+                  <!-- todo text -->
+                  <span class="text">{{DASH.keyTerm}}</span>
+                  <!-- Emphasis label -->
+                  <small class="label label-primary" ng-show="DASH.user.etapasConcluidas.termoaceite"><i
+                      class="fa fa-clock-o"></i> {{DASH.user.etapasConcluidas.termoaceite | date : 'dd/MM/yyyy \'às\'
+                    HH:mm'}}</small>
+                  <!-- General tools such as edit or delete-->
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 text-left">
+          <br>
+          <div class="box box-success">
+            <div class="box-header" style="cursor: move;">
+              <i class="ion ion-clipboard"></i>
+              <h3 class="box-title">Treinamentos Disponíveis</h3>
+            </div>
+
+            <!-- /.box-header -->
+            <div class="box-body">
+              <ul class="todo-list ui-sortable" ng-repeat="programa in DASH.userProgresses">
+                <li>
+                  <span class="text">{{programa.nome}} {{programa.versao}}</span>
+                  <small class="label label-success" ng-show="programa.concluiu">
+                    <i class="fa fa-check-square-o"></i>
+                  </small>
+                  <small class="label label-primary" ng-show="DASH.programaAtivo.id === programa.id">
+                    Você está aqui
+                  </small>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <br>
+          <div class="box">
+            <div class="box-body">
+              <h3 style="font-size: 1.4em">Programa {{DASH.programaAtivo.versao}} - {{DASH.programaAtivo.nome}}</h3>
+              <div class="row">
+                <div class="col-md-12">
+                  <table class="table table-hover">
+                    <thead>
+                      <tr style="background-color: #C1C1C1">
+                        <th>Empresa</th>
+                        <th>CPF</th>
+                        <th>Nome</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <th ng-bind="DASH.user.empresa.nome"></th>
+                        <th ng-bind="DASH.user.cpf|cpfCnpj"></th>
+                        <th ng-bind="DASH.user.nome"></th>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <h3 style="font-size: 1.4em">Avaliação da Certificação</h3>
+              <div class="row">
+                <div class="col-md-12">
+                  <table class="table table-hover" ng-show="DASH.ultimasProvas.length">
+                    <thead>
+                      <tr style="background-color: #C1C1C1">
+                        <th>Versão</th>
+                        <th>Data de Término</th>
+                        <th>Nota</th>
+                        <th>Acertos</th>
+                        <th>Erros</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr ng-repeat="prova in DASH.ultimasProvas track by $index">
+                        <th ng-bind="prova.versao.versao"></th>
+                        <th ng-bind="prova.horaTerminoCliente | date : 'dd/MM/yyyy \'às\' HH:mm'"></th>
+                        <th ng-bind="(prova.nota|number:2)"></th>
+                        <th ng-bind="prova.questoesAcertadas"></th>
+                        <th ng-bind="prova.questoes.length-prova.questoesAcertadas"></th>
+                      </tr>
+                    </tbody>
+                  </table>
+                  <p class="text-black" ng-show="!DASH.ultimasProvas.length">Nenhuma prova terminada até o momento.</p>
+                  <p class="text-danger" ng-show="DASH.user.maiorNota < 8 && DASH.user.maiorNota > -1">Não atingiu a
+                    nota
+                    mínima para completar o programa!</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-xs-12">
+        <div class="col-xs-12" ng-bind-html="DASH.message | rawHtml" ng-show="DASH.message"></div>
+      </div>
+    </div>
+
+  </div>
+  <div class="modal fade" id="modalTermReject" tabindex="-1" role="dialog" aria-labelledby="modalForm"
+    data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-sm" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+              aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title">
+            Termo Rejeitado
+          </h4>
+        </div>
+        <div class="modal-body">
+          <p>Você rejeitou o termo de aceite. O programa não será concluído sem a aceitação.</p>
+          <br>
+        </div>
+        <div class="modal-footer">
+          <a class="btn btn-info" data-dismiss="modal" ng-click="DASH.backTermo()">
+            <i class="fa fa-left"></i>
+            Voltar para os termos </a>
+          <button type="button" class="btn btn-default" data-dismiss="modal">
+            <i class="fa fa-close"></i> Cancelar </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-template>

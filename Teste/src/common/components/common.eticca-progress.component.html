@@ -1,0 +1,65 @@
+<div ng-show="visible">
+  <div class="row">
+    <div class="col-xs-12" ng-class="{'text-center': position.atualProgress===position.totalPos}">
+      <div class="progress">
+        <div class="progress-bar" role="progressbar" aria-valuenow="{{position.curPos}}" aria-valuemin="0"
+          aria-valuemax="{{position.totalPos}}" ng-style="progressStyle">
+          {{position.curPos}} de {{position.totalPos}}
+        </div>
+      </div>
+      <small ng-show="position.atualProgress===position.totalPos&&concluiu">
+        <p class="text-success">Programa concluído</p>
+      </small>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-6 ">
+      <a class="btn btn-primary pull-left" ng-disabled="!position.prevName" ng-href="{{position.prevUrl}}"
+        ng-hide="loading">
+        <i class="fa fa-chevron-left"></i> {{position.prevName}}
+      </a>
+      <a class="btn btn-primary pull-left" ng-disabled="!position.prevName" ng-href="{{position.prevUrl}}"
+        ng-show="loading">
+        <div class="sk-circle">
+          <div class="sk-circle1 sk-child"></div>
+          <div class="sk-circle2 sk-child"></div>
+          <div class="sk-circle3 sk-child"></div>
+          <div class="sk-circle4 sk-child"></div>
+          <div class="sk-circle5 sk-child"></div>
+          <div class="sk-circle6 sk-child"></div>
+          <div class="sk-circle7 sk-child"></div>
+          <div class="sk-circle8 sk-child"></div>
+          <div class="sk-circle9 sk-child"></div>
+          <div class="sk-circle10 sk-child"></div>
+          <div class="sk-circle11 sk-child"></div>
+          <div class="sk-circle12 sk-child"></div>
+        </div>
+      </a>
+      <br>
+      <br>
+    </div>
+    <div class="col-xs-6 ">
+      <a class="btn btn-primary pull-right" id="progressNext" ng-disabled="!position.nextName"
+        ng-href="{{position.nextUrl}}" ng-hide="loading">
+        {{position.nextName}} <i class="fa fa-chevron-right"></i>
+      </a>
+      <a class="btn btn-primary pull-right" id="progressNext" ng-disabled="!position.nextName"
+        ng-href="{{position.nextUrl}}" ng-show="loading">
+        <div class="sk-circle">
+          <div class="sk-circle1 sk-child"></div>
+          <div class="sk-circle2 sk-child"></div>
+          <div class="sk-circle3 sk-child"></div>
+          <div class="sk-circle4 sk-child"></div>
+          <div class="sk-circle5 sk-child"></div>
+          <div class="sk-circle6 sk-child"></div>
+          <div class="sk-circle7 sk-child"></div>
+          <div class="sk-circle8 sk-child"></div>
+          <div class="sk-circle9 sk-child"></div>
+          <div class="sk-circle10 sk-child"></div>
+          <div class="sk-circle11 sk-child"></div>
+          <div class="sk-circle12 sk-child"></div>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>

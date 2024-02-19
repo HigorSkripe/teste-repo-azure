@@ -1,0 +1,54 @@
+<header class="header">
+  <a ng-href="{{ params.logo.href }}" class="logo">
+    <span ng-if="
+        angular.isUndefined(params.logo.image) ||
+        angular.isNull(params.logo.image) ||
+        !params.logo.image
+      " ng-bind="params.logo.text"></span>
+    <img ng-src="{{ params.logo.image }}" alt="{{ params.logo.text }}" ng-show="!!params.logo.image" />
+  </a>
+  <nav class="navbar navbar-static-top" role="navigation" id="{{ params.id }}">
+    <a ng-click="params.toggleClick()" class="navbar-btn sidebar-toggle" data-toggle="offcanvas" role="button"><span
+        class="sr-only">Toggle navigation</span>
+      <span class="icon-bar"></span> <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </a>
+    <div class="navbar-right" ng-if="!!params.user">
+      <ul class="nav navbar-nav">
+        <li class="user user-menu" title="Configurações da conta">
+          <a href="/app/perfil">
+            <i class="glyphicon glyphicon-user"></i>
+            <span ng-bind="params.user.nome" class="hidden-xs"></span>
+          </a>
+        </li>
+        <li class="user user-menu" ng-if="params.user.isAdmin || params.user.isOperador"
+          title="{{ params.adminPage ? 'Colaborador' : 'Administração' }}">
+          <a ng-href="{{ params.adminPage ? '/app/dashboard' : '/admin/dashboard' }}">
+            <i class="glyphicon" ng-class="{
+                'glyphicon-lock': !params.adminPage,
+                'glyphicon-globe': params.adminPage
+              }"></i>
+            <span class="hidden-xs" ng-bind="params.adminPage?'Colaborador':'Administração'"></span>
+          </a>
+        </li>
+        <li class="user user-menu" title="Contato com entidades públicas">
+          <a href="/app/contato-entidade-publica">
+            <i class="glyphicon glyphicon-phone-alt"></i>
+            <span class="hidden-xs">{{ keys.entidadesPublicas }}</span>
+          </a>
+        </li>
+        <li class="user user-menu" title="Denúncia">
+          <a target="_blank" href="/denuncia">
+            <i class="glyphicon glyphicon-bullhorn"></i>
+            <span class="hidden-xs">{{ keys.denuncia }}</span>
+          </a>
+        </li>
+        <li class="user user-menu" title="Sair">
+          <a style="font-weight: normal" ng-click="logout()">
+            <span class="hidden-xs">Sair </span><i class="glyphicon glyphicon-log-out"></i>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>

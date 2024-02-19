@@ -1,0 +1,302 @@
+<app-template app-ref="CONEP.appRef">
+  <div class="col-xs-12">
+    <div class="row">
+      <div class="col-xs-12">
+        <div class="box">
+          <div class="box-header">
+            <h3 class="box-title">Contatos cadastrados</h3>
+            <div class="box-tools">
+              <div class="input-group">
+                <input ng-model="CONEP.pagination.search" type="text" name="table_search" ng-change="CONEP.pesquisar()"
+                  class="form-control input-sm pull-right" style="width: 150px;" ng-model-options="{ debounce: 1000 }"
+                  placeholder="Pesquisar">
+                <div class="input-group-btn">
+                  <button class="btn btn-sm btn-default">
+                    <i class="fa fa-search"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="box-body table-responsive no-padding">
+            <table class="table table-hover">
+              <thead>
+                <tr class="orderby">
+                  <th ng-click="CONEP.orderBy('publicentity_name')">Entidade pública
+                    <i class="fa" ng-show="CONEP.order.predicate=='publicentity_name'"
+                      ng-class="{'fa-sort-desc': CONEP.order.reverse, 'fa-sort-up': !CONEP.order.reverse}"></i>
+                  </th>
+                  <th ng-click="CONEP.orderBy('publicentity_product')">Produto / Serviço
+                    <i class="fa" ng-show="CONEP.order.predicate=='publicentity_product'"
+                      ng-class="{'fa-sort-desc': CONEP.order.reverse, 'fa-sort-up': !CONEP.order.reverse}"></i>
+                  </th>
+                  <th ng-click="CONEP.orderBy('created_user_name')">Autor
+                    <i class="fa" ng-show="CONEP.order.predicate=='created_user_name'"
+                      ng-class="{'fa-sort-desc': CONEP.order.reverse, 'fa-sort-up': !CONEP.order.reverse}"></i>
+                  </th>
+                  <th ng-click="CONEP.orderBy('publicentity_contact')">Contato
+                    <i class="fa" ng-show="CONEP.order.predicate=='publicentity_contact'"
+                      ng-class="{'fa-sort-desc': CONEP.order.reverse, 'fa-sort-up': !CONEP.order.reverse}"></i>
+                  </th>
+                  <th ng-click="CONEP.orderBy('publicentity_meeting_date')">Data da reunião
+                    <i class="fa" ng-show="CONEP.order.predicate=='publicentity_meeting_date'"
+                      ng-class="{'fa-sort-desc': CONEP.order.reverse, 'fa-sort-up': !CONEP.order.reverse}"></i>
+                  </th>
+                  <th ng-click="CONEP.orderBy('publicentity_meeting')">Pauta
+                    <i class="fa" ng-show="CONEP.order.predicate=='publicentity_meeting'"
+                      ng-class="{'fa-sort-desc': CONEP.order.reverse, 'fa-sort-up': !CONEP.order.reverse}"></i>
+                  </th>
+                  <th ng-show="CONEP.user.isAdmin"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="linkable" ng-repeat="contato in CONEP.pagination.list"
+                  ng-click="CONEP.viewContato($event, contato)">
+                  <td ng-bind="contato.publicEntity"></td>
+                  <td ng-bind="contato.product"></td>
+                  <td ng-bind="contato.userName"></td>
+                  <td ng-bind="contato.contact"></td>
+                  <td ng-bind="contato.meetingDate | date:'dd/MM/yyyy'"></td>
+                  <td ng-bind="contato.meeting"></td>
+                  <td ng-show="CONEP.user.isAdmin">
+                    <button class="btn btn-danger btn-sm" id="{{'del_'+contato.id}}"
+                      ng-bootbox-confirm="Tem certeza que deseja apagar o contato selecionado?"
+                      ng-bootbox-confirm-action="CONEP.deleteContato(contato)"
+                      ng-disabled="CONEP.isBefore24HoursFromNow(contato.insertedAt)"
+                      title="{{CONEP.isBefore24HoursFromNow(contato.insertedAt) ? 'Tempo limite de 24h excedido!' : 'Excluir'}}">
+                      <i class="fa fa-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr ng-if="CONEP.pagination.list.length === 0">
+                  <td colspan="6">Nenhum contato cadastrado.</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="box-footer clearfix">
+              <ul class="pagination pagination-sm no-margin pull-right">
+                <li ng-click="CONEP.pagination.prev()" ng-class="{'disabled': CONEP.pagination.page===1}">
+                  <a href="#">«</a>
+                </li>
+                <li ng-repeat="page in CONEP.pagination.range" ng-class="{'disabled': CONEP.pagination.page===page}"
+                  ng-click="CONEP.pagination.goTo(page)">
+                  <a href="#" ng-bind="page + 1"></a>
+                </li>
+                <li ng-click="CONEP.pagination.next()"
+                  ng-class="{'disabled': CONEP.pagination.page===CONEP.pagination.totalPages}">
+                  <a href="#">»</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12">
+        <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#modalForm"
+          ng-click="CONEP.newContato(contatoForm)">
+          <i class="fa fa-plus"></i> Novo</button>
+        <button class="btn btn-info btn-lg" data-toggle="modal" data-target="#modalReport"
+          ng-click="CONEP.newContato(contatoForm)" style="margin-left: 15px">
+          <i class="fa fa-print"></i> Relatório</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalForm" tabindex="-1" role="dialog" aria-labelledby="modalForm" data-backdrop="static">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h4 class="modal-title">{{CONEP.formModel.id ? 'Editar' : 'Cadastrar'}} contato com entidade pública</h4>
+        </div>
+        <div class="modal-body">
+          <form ng-class="{'has-error': CONEP.formErrors.hasError}" name="contatoForm">
+            <div class="row">
+              <div class="col-sm-12">
+                <div class="form-group"
+                  ng-class="{'has-error': contatoForm.publicEntity.$invalid && !contatoForm.publicEntity.$untouched}">
+                  <label for="publicEntity">Entidade pública</label>
+                  <input type="text" class="form-control" id="publicEntity" name="publicEntity"
+                    ng-disabled="CONEP.formModelDisabeld" placeholder="Entidade pública"
+                    ng-model="CONEP.formModel.publicEntity" required>
+                  <span class="control-label" ng-show="contatoForm.publicEntity.$error.required">* Campo
+                    requerido!</span>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12">
+                <div class="form-group"
+                  ng-class="{'has-error': contatoForm.product.$invalid && !contatoForm.product.$untouched}">
+                  <label for="product">Produto / Serviço</label>
+                  <input type="text" class="form-control" id="product" name="product" placeholder="Produto / Serviço"
+                    ng-disabled="CONEP.formModelDisabeld" ng-model="CONEP.formModel.product" required>
+                  <span class="control-label" ng-show="contatoForm.product.$error.required">* Campo
+                    requerido!</span>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12 col-md-6">
+                <div class="form-group"
+                  ng-class="{'has-error': contatoForm.contactDate.$invalid && !contatoForm.contactDate.$untouched}">
+                  <label for="contactDate">Data</label>
+                  <div class='input-group date' id='datetimepicker1'>
+                    <input type='text' class="form-control" ng-model="CONEP.formModel.contactDate" id="contactDate"
+                      ng-disabled="CONEP.formModelDisabeld" name="contactDate" placeholder="__/__/____" required>
+                    <span class="input-group-addon">
+                      <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                  </div>
+                  <span class="control-label" ng-show="contatoForm.contactDate.$error.required">* Campo
+                    requerido!</span>
+                </div>
+              </div>
+              <div class="col-sm-12 col-md-6">
+                <div class="form-group"
+                  ng-class="{'has-error': contatoForm.contact.$invalid && !contatoForm.contact.$untouched}">
+                  <label for="contact">Contato</label>
+                  <input type="text" class="form-control" id="contact" name="contact" placeholder="Contato"
+                    ng-disabled="CONEP.formModelDisabeld" ng-model="CONEP.formModel.contact" required>
+                  <span class="control-label" ng-show="contatoForm.contact.$error.required">* Campo requerido!</span>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-12 col-md-6">
+                <div class="form-group"
+                  ng-class="{'has-error': contatoForm.meeting.$invalid && !contatoForm.meeting.$untouched}">
+                  <label for="meeting">Pauta</label>
+                  <input type="text" class="form-control" id="meeting" name="meeting" ng-model="CONEP.formModel.meeting"
+                    ng-disabled="CONEP.formModelDisabeld" required>
+                  <span class="control-label" ng-show="contatoForm.meeting.$error.required">* Campo requerido!</span>
+                </div>
+              </div>
+              <div class="col-sm-12 col-md-6">
+                <div class="form-group"
+                  ng-class="{'has-error': contatoForm.meetingDate.$invalid && !contatoForm.meetingDate.$untouched}">
+                  <label for="meetingDate">Data da reunião</label>
+                  <div class='input-group date' id='datetimepicker2'>
+                    <input type='text' class="form-control" ng-model="CONEP.formModel.meetingDate" id="meetingDate"
+                      ng-disabled="CONEP.formModelDisabeld" name="meetingDate" placeholder="__/__/____" required>
+                    <span class="input-group-addon">
+                      <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                  </div>
+                  <span class="control-label" ng-show="contatoForm.meetingDate.$error.required">* Campo
+                    requerido!</span>
+                </div>
+              </div>
+            </div>
+
+            <hr />
+
+            <div class="row" ng-show="CONEP.formModel.anexos && CONEP.formModel.anexos.length">
+              <div class="form-group col-md-12">
+                <label for="documento">Anexos</label>
+              </div>
+              <div class="form-group col-md-12">
+                <div class="form-group input-group invoice-col col-xs-12 col-md-12 col-sm-12">
+                  <a class="btn btn-info btn-flat btn-xs download-file" type="button"
+                    ng-repeat="anexo in CONEP.formModel.anexos"
+                    ng-click="CONEP.downloadAnexo(CONEP.formModel.id, anexo, $index)" data-toggle="tooltip"
+                    title="{{anexo.originalname}}">
+                    <i class="fa fa-download"></i>
+                    {{anexo.originalname}}
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="form-group col-md-12">
+                <label for="documento">Novos anexos</label>
+                <ul ng-show="CONEP.contatoDataFiles && CONEP.contatoDataFiles.length" id="contatoDocumentoFileList"
+                  class="file-list">
+                  <li ng-repeat="f in CONEP.contatoDataFiles">
+                    {{f.name}} &nbsp;<span class="fileError">{{f.sizeError ? ' * Anexo maior que 2mb' : ''}}</span>
+                    <button ng-click="CONEP.removeFile($index)" type="button" class="close" data-dismiss="alert"
+                      aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                  </li>
+                </ul>
+                <div class="input-group">
+                  <span class="input-group-btn">
+                    <div class="btn btn-default custom-file-uploader">
+                      <input type="file" id="contatoDocumento" name="documento" file-model="CONEP.auxContatoDataFiles"
+                        accept=".avi, .jpg, .png, .bmp, .mp3. .mp4, .doc, .docx, .pdf"
+                        ng-disabled="CONEP.formModelDisabeld" ng-on-change="CONEP.changeFileInput()" multiple>
+                      Adicionar anexo(s)
+                    </div>
+                  </span>
+                </div>
+                <span class="help-block">* Quantidade máxima de anexos: 5</span>
+                <span class="help-block">** Tamanho máximo de cada anexo: 2mb</span>
+              </div>
+              <div class="col-md-12" ng-show="CONEP.formModel.contatoAnexoError" style="margin-bottom: 10px">
+                <div class="alert alert-danger no-margin">
+                  <p>{{CONEP.formModel.contatoAnexoError}}</p>
+                </div>
+              </div>
+            </div>
+
+            <hr />
+
+            <div class="row">
+              <div class="col-sm-12">
+                <div class="form-group"
+                  ng-class="{'has-error': contatoForm.product.$invalid && !contatoForm.product.$untouched}">
+                  <label for="observations">Observações</label>
+                  <textarea type="text" class="form-control" id="observations" name="observations"
+                    ng-disabled="CONEP.formModelDisabeld" placeholder="Observações"
+                    ng-model="CONEP.formModel.observations" rows="8" required></textarea>
+                  <span class="control-label" ng-show="contatoForm.observations.$error.required">* Campo
+                    requerido!</span>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-warning pull-left" ng-disabled="CONEP.formModelDisabeld"
+            ng-click="CONEP.clearModalForm(contatoForm)">Limpar</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+          <button type="button" class="btn btn-success" ng-click="CONEP.save(contatoForm)"
+            ng-disabled="CONEP.formModelDisabeld || CONEP.formModel.contatoAnexoError || CONEP.processing"
+            ng-disabled="contatoForm.$invalid">
+            Salvar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="modalReport" tabindex="-1" role="dialog" aria-labelledby="modalReport"
+    data-backdrop="static">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+          <h4 class="modal-title">Gerar relatório de contato com entidades públicas</h4>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="local">Local</label>
+            <input type="text" class="form-control" placeholder="Cidade - UF" ng-model="CONEP.modalReport.local">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Fechar</button>
+          <button type="button" class="btn btn-success" ng-click="CONEP.getReport()">
+            Gerar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</app-template>
